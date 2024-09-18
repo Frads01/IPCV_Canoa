@@ -9,13 +9,13 @@ https://www.ivreacanoaclub.info/stadio-della-canoa/webcam/ <br>
 
 
 ### PONTE_SINISTRA
-[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_1.mp4)12:08<br>
-[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_2.mp4)14:08<br>
+[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_1.mp4) 12:08<br>
+[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_2.mp4) 14:08<br>
 [streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_3.mp4) 16:08<br>
 
 ### BALCONE_DIETRO
 [streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_0.mp4) 10:10<br>
-[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_1.mp4) 12:10<br>
+[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_1.mp4) 12:10<br> (switch a 1h 13m)
 
 ### BALCONE_DAVANTI
 [streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_2.mp4) 14:10<br>
