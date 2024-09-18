@@ -16,7 +16,7 @@ https://www.ivreacanoaclub.info/stadio-della-canoa/webcam/ <br>
 ### BALCONE
 - #### DIETRO
 &nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_0.mp4) 10:10<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_1.mp4) 12:10 (switch BALCONE_DIETRO -> BALCONE_AVANTI: **1h 13m**) <br> 
+&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_1.mp4) 12:10 (switch DIETRO -> AVANTI: **1h 13m**) <br> 
 
 - #### DAVANTI
 &nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_2.mp4) 14:10<br>
