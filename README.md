@@ -24,7 +24,7 @@ https://www.ivreacanoaclub.info/stadio-della-canoa/webcam/ <br>
 ### LUNGO_CANALE
 [streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_1.mp4) 12:11<br>
 [streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_2.mp4) 14:11<br>
-[streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_4.mp4) 16:11<br>
+[streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_3.mp4) 16:11<br>
 
 ### ARRIVO
 [streaming_out_1080p_2024-07-17-08.11.35.842-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.35.842-UTC_1.mp4) 12:11<br>
