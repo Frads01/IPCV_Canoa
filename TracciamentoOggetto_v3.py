@@ -69,7 +69,9 @@ class Porta:
         return self.y4 - self.y2
 
 
-OFFSET = 20
+VIDEO_ROOT = 'Video_Canoa/'
+MASK_ROOT = 'IstantaneeCamere/'
+OFFSET = 15
 FRAME_PRECEDENTI = 3
 RED = (0, 0, 255)
 GREEN = (0, 255, 0)
@@ -118,13 +120,13 @@ PORTE_BalconeDietro: list[Porta] = [
     
 ]
 PORTE_BalconeAvanti: list[Porta] = [
-    Porta(x1=537, y1=791, x2=404, y2=798, x3=571, y3=1115, x4=430, y4=1083, color=GREEN, numero=41, tipo=Entrata.BASSO),
-    Porta(x1=1052, y1=680, x2=856, y2=685, x3=1088, y3=1069, x4=850, y4=1055, color=GREEN, numero=42, tipo=Entrata.BASSO),
-    Porta(x1=1373, y1=667, x2=1213, y2=670, x3=1394, y3=928, x4=1224, y4=911, color=GREEN, numero=43, tipo=Entrata.BASSO),
-    Porta(x1=1798, y1=648, x2=1620, y2=630, x3=1803, y3=1157, x4=1656, y4=1133, color=GREEN, numero=44, tipo=Entrata.BASSO),
-    Porta(x1=2360, y1=660, x2=2195, y2=656, x3=2364, y3=893, x4=2202, y4=905, color=RED, numero=45, tipo=Entrata.BASSO),
-    Porta(x1=2235, y1=622, x2=2075, y2=636, x3=2234, y3=857, x4=2075, y4=849, color=RED, numero=46, tipo=Entrata.BASSO),
-    Porta(x1=1984, y1=610, x2=1872, y2=623, x3=1990, y3=973, x4=1856, y4=947, color=GREEN, numero=47, tipo=Entrata.BASSO),
+    Porta(x1=403, y1=533, x2=303, y2=532, x3=428, y3=744, x4=322, y4=722, color=GREEN, numero=41, tipo=Entrata.BASSO),
+    Porta(x1=789, y1=458, x2=642, y2=457, x3=816, y3=712, x4=662, y4=704, color=GREEN, numero=42, tipo=Entrata.BASSO),
+    Porta(x1=1035, y1=449, x2=910, y2=447, x3=1045, y3=623, x4=918, y4=607, color=GREEN, numero=43, tipo=Entrata.BASSO),
+    Porta(x1=1354, y1=436, x2=1238, y2=420, x3=1358, y3=578, x4=1242, y4=567, color=GREEN, numero=44, tipo=Entrata.BASSO),
+    Porta(x1=1784, y1=445, x2=1663, y2=437, x3=1787, y3=558, x4=1666, y4=566, color=RED, numero=45, tipo=Entrata.BASSO),
+    Porta(x1=1687, y1=419, x2=1594, y2=424, x3=1686, y3=535, x4=1594, y4=531, color=RED, numero=46, tipo=Entrata.BASSO),
+    Porta(x1=1497, y1=411, x2=1411, y2=415, x3=1502, y3=512, x4=1414, y4=508, color=GREEN, numero=47, tipo=Entrata.BASSO),
 ]
 PORTE_LungoCanale: list[Porta] = [
     Porta(x1=382, y1=430, x2=367, y2=339, x3=386, y3=507, x4=365, y4=471, color=GREEN, numero=50, tipo=Entrata.BASSO),
@@ -144,8 +146,7 @@ PORTE_Arrivo: list[Porta] = [
     Porta(x1=1721, y1=482, x2=1750, y2=456, x3=1694, y3=598, x4=1727, y4=565, color=GREEN, numero=59, tipo=Entrata.ALTO),
     Porta(x1=1718, y1=674, x2=1747, y2=635, x3=1652, y3=853, x4=1697, y4=800, color=GREEN, numero=60, tipo=Entrata.ALTO),
 ]
-VIDEO_ROOT = 'Video_Canoa/'
-MASK_ROOT = 'IstantaneeCamere/'
+
 
 def get_screen_size():
     root = tk.Tk()
@@ -155,6 +156,27 @@ def get_screen_size():
     return width, height
 
 
+def cross_product(xa, ya, xb, yb):
+    return xa * yb - ya * xb
+
+
+def is_point_in_rotated_rectangle(xp, yp, vertices):
+    x1, y1 = vertices[0]
+    x2, y2 = vertices[1]
+    x3, y3 = vertices[2]
+    x4, y4 = vertices[3]
+    
+    cp1 = cross_product(x2 - x1, y2 - y1, xp - x1, yp - y1)
+    cp2 = cross_product(x3 - x2, y3 - y2, xp - x2, yp - y2)
+    cp3 = cross_product(x4 - x3, y4 - y3, xp - x3, yp - y3)
+    cp4 = cross_product(x1 - x4, y1 - y4, xp - x4, yp - y4)
+
+    if (cp1 > 0 and cp2 > 0 and cp3 > 0 and cp4 > 0) or (cp1 < 0 and cp2 < 0 and cp3 < 0 and cp4 < 0):
+        return True
+    else:
+        return False
+
+
 def check(track: list[any]):
     track_rev = track.copy()
     track_rev.reverse()
@@ -162,17 +184,16 @@ def check(track: list[any]):
         (xm, ym) = (porta.x3+porta.x4)/2, (porta.y3+porta.y4)/2
         
         # min e max
-        [min_x, max_x] = [min(porta.x3, porta.x4), max(porta.x3, porta.x4)]
-        [min_y, max_y] = [min(porta.y3, porta.y4), max(porta.y3, porta.y4)]
+        # [min_x, max_x] = [min(porta.x3, porta.x4), max(porta.x3, porta.x4)]
+        # [min_y, max_y] = [min(porta.y3, porta.y4), max(porta.y3, porta.y4)]
         
-        if (min_x < track_rev[0][0] < max_x
-        and min_y < track_rev[0][1] < max_y):
+        vertici_full = [(porta.x3-OFFSET, porta.y3-OFFSET), (porta.x4-OFFSET, porta.y3-OFFSET), (porta.x3+OFFSET, porta.y3+OFFSET), (porta.x4+OFFSET, porta.y4+OFFSET)]
+        vertici_ax = [(porta.x3-OFFSET, porta.y3-OFFSET), (porta.x4-OFFSET, porta.y3-OFFSET), (porta.x3, porta.y3), (porta.x4, porta.y4)]
+        
+        if (is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_full)):
             for i in range(1, FRAME_PRECEDENTI + 1):
                 
-                if (track_rev[i] < track_rev[0]
-                and (xm, ym) < track_rev[0]
-                and min_x < track_rev[i][0] < max_x
-                and min_y < track_rev[i][1] < max_y):
+                if (is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax)):
                     return (True, porta.numero)
                 
     return None
