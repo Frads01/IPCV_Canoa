@@ -15,7 +15,7 @@ class Entrata(Enum): # Verso di ENTRATA nella porta
 
 
 class Porta:
-    color: (int, int, int)
+    color: (int, int, int) # type: ignore
     numero: int
     tipo: Entrata
     x1: float
@@ -73,6 +73,7 @@ OFFSET = 20
 FRAME_PRECEDENTI = 3
 RED = (0, 0, 255)
 GREEN = (0, 255, 0)
+# Tutte le coordinate sono state prese con risoluzione 2560x1600
 PORTE_Inizio: list[Porta] = [
     Porta(x1=153, y1=419, x2=185, y2=415, x3=156, y3=468, x4=186, y4=461, color=GREEN, numero=1, tipo=Entrata.ALTO),
     Porta(x1=279, y1=448, x2=308, y2=438, x3=281, y3=488, x4=309, y4=474, color=GREEN, numero=2, tipo=Entrata.ALTO),
@@ -113,14 +114,17 @@ PORTE_PonteSinistra: list[Porta] = [
     Porta(x1=261, y1=163, x2=154, y2=168, x3=265, y3=277, x4=158, y4=279, color=RED, numero=39, tipo=Entrata.BASSO),
     Porta(x1=743, y1=124, x2=658, y2=121, x3=745, y3=209, x4=657, y4=210, color=GREEN, numero=40, tipo=Entrata.BASSO),
 ]
-PORTE_Balcone: list[Porta] = [
-    Porta(x1=403, y1=533, x2=303, y2=532, x3=428, y3=744, x4=322, y4=722, color=GREEN, numero=41, tipo=Entrata.BASSO),
-    Porta(x1=789, y1=458, x2=642, y2=457, x3=816, y3=712, x4=662, y4=704, color=GREEN, numero=42, tipo=Entrata.BASSO),
-    Porta(x1=1035, y1=449, x2=910, y2=447, x3=1045, y3=623, x4=918, y4=607, color=GREEN, numero=43, tipo=Entrata.BASSO),
-    Porta(x1=1354, y1=436, x2=1238, y2=420, x3=1358, y3=578, x4=1242, y4=567, color=GREEN, numero=44, tipo=Entrata.BASSO),
-    Porta(x1=1784, y1=445, x2=1663, y2=437, x3=1787, y3=558, x4=1666, y4=566, color=RED, numero=45, tipo=Entrata.BASSO),
-    Porta(x1=1687, y1=419, x2=1594, y2=424, x3=1686, y3=535, x4=1594, y4=531, color=RED, numero=46, tipo=Entrata.BASSO),
-    Porta(x1=1497, y1=411, x2=1411, y2=415, x3=1502, y3=512, x4=1414, y4=508, color=GREEN, numero=47, tipo=Entrata.BASSO),
+PORTE_BalconeDietro: list[Porta] = [
+    
+]
+PORTE_BalconeAvanti: list[Porta] = [
+    Porta(x1=537, y1=791, x2=404, y2=798, x3=571, y3=1115, x4=430, y4=1083, color=GREEN, numero=41, tipo=Entrata.BASSO),
+    Porta(x1=1052, y1=680, x2=856, y2=685, x3=1088, y3=1069, x4=850, y4=1055, color=GREEN, numero=42, tipo=Entrata.BASSO),
+    Porta(x1=1373, y1=667, x2=1213, y2=670, x3=1394, y3=928, x4=1224, y4=911, color=GREEN, numero=43, tipo=Entrata.BASSO),
+    Porta(x1=1798, y1=648, x2=1620, y2=630, x3=1803, y3=1157, x4=1656, y4=1133, color=GREEN, numero=44, tipo=Entrata.BASSO),
+    Porta(x1=2360, y1=660, x2=2195, y2=656, x3=2364, y3=893, x4=2202, y4=905, color=RED, numero=45, tipo=Entrata.BASSO),
+    Porta(x1=2235, y1=622, x2=2075, y2=636, x3=2234, y3=857, x4=2075, y4=849, color=RED, numero=46, tipo=Entrata.BASSO),
+    Porta(x1=1984, y1=610, x2=1872, y2=623, x3=1990, y3=973, x4=1856, y4=947, color=GREEN, numero=47, tipo=Entrata.BASSO),
 ]
 PORTE_LungoCanale: list[Porta] = [
     Porta(x1=382, y1=430, x2=367, y2=339, x3=386, y3=507, x4=365, y4=471, color=GREEN, numero=50, tipo=Entrata.BASSO),
@@ -140,7 +144,8 @@ PORTE_Arrivo: list[Porta] = [
     Porta(x1=1721, y1=482, x2=1750, y2=456, x3=1694, y3=598, x4=1727, y4=565, color=GREEN, numero=59, tipo=Entrata.ALTO),
     Porta(x1=1718, y1=674, x2=1747, y2=635, x3=1652, y3=853, x4=1697, y4=800, color=GREEN, numero=60, tipo=Entrata.ALTO),
 ]
-
+VIDEO_ROOT = 'Video_Canoa/'
+MASK_ROOT = 'IstantaneeCamere/'
 
 def get_screen_size():
     root = tk.Tk()
@@ -180,16 +185,34 @@ def run_tracker_in_thread(filename, model, file_index):
     # Store the track history
     track_history = defaultdict(lambda: [])
 
-    cap = cv2.VideoCapture(filename + '.mp4')  # Read the video file
+    cap = cv2.VideoCapture(VIDEO_ROOT + filename + '.mp4')  # Read the video file
     success, frame = cap.read()
 
-    mask = cv2.imread(filename + '_Mask.png', 0)
+    mask = cv2.imread(MASK_ROOT + filename + '_Mask.png', 0)
     _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
     mask = mask // 255
     mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
     # Define the codec and create a VideoWriter object
     fourcc = cv2.VideoWriter.fourcc(*'mp4v')
     out_name = 'track_' + str(filename + '.mp4')
+    
+    match filename:
+        case '1-Inizio':
+            array_porte = PORTE_Inizio
+        case '2-PonteDestra':
+            array_porte = PORTE_PonteDestra
+        case '3-PonteSinistra':
+            array_porte = PORTE_PonteSinistra
+        case '4-BalconeAvanti':
+            array_porte = PORTE_BalconeAvanti
+        case '5-LungoCanale':
+            array_porte = PORTE_LungoCanale
+        case '6-Arrivo':
+            array_porte = PORTE_Arrivo
+        case '2-PonteDestraShort': 
+            array_porte = PORTE_PonteDestra
+            
+    
     # out = cv2.VideoWriter(out_name, fourcc, cap.get(cv2.CAP_PROP_FPS), (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
     # int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     frame_num = 1
@@ -234,7 +257,7 @@ def run_tracker_in_thread(filename, model, file_index):
                     frame[maschera] = annotated_frame[maschera]
                     
             fontsize = 2
-            for porta in PORTE_PonteDestra:
+            for porta in array_porte:
                 frame = porta.draw(frame)
             
             cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
@@ -269,24 +292,41 @@ def run_tracker_in_thread(filename, model, file_index):
 model1 = YOLO("yolov9e-seg.pt")
 model2 = YOLO("yolov9e-seg.pt")
 
-# Define the video files for the trackers
-ponteDestra = 'IstantaneeCamere/2-PonteDestra'
-ponteDestraShort = 'IstantaneeCamere/2-PonteDestraShort'
-
-video_file1 = 'cut.mp4'  # Path to video file, 0 for webcam
-video_file2 = 'cut.mp4'  # Path to video file, 0 for webcam, 1 for external camera
+# Define the video files and the masks for the trackers
+inizio = '1-Inizio'
+ponteDestra = '2-PonteDestra'
+ponteDestraShort = '2-PonteDestraShort'
+ponteSinistra = '3-PonteSinistra'
+balconeAvanti = '4-BalconeAvanti'
+lungoCanale = '5-LungoCanale'
+arrivo = '6-Arrivo'
 
 # Create the tracker threads
-tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(ponteDestraShort, model1, 1), daemon=True)
-# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(ponteDestra, model2, 2), daemon=True)
+tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(balconeAvanti, model1, 1), daemon=True)
+# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(ponteDestra, model1, 2), daemon=True)
+# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(ponteSinistra, model1, 3), daemon=True)
+# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(balconeDietro, model1, 4), daemon=True)
+# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(balconeAvanti, model1, 4), daemon=True)
+# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(lungoCanale, model1, 5), daemon=True)
+# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(arrivo, model1, 6), daemon=True)
 
 # Start the tracker threads
 tracker_thread1.start()
 # tracker_thread2.start()
+# tracker_thread3.start()
+# tracker_thread4.start()
+# tracker_thread5.start()
+# tracker_thread6.start()
+# tracker_thread7.start()
 
 # Wait for the tracker threads to finish
 tracker_thread1.join()
 # tracker_thread2.join()
+# tracker_thread3.join()
+# tracker_thread4.join()
+# tracker_thread5.join()
+# tracker_thread6.join()
+# tracker_thread7.join()
 
 # Clean up and close windows
 cv2.destroyAllWindows()
