@@ -2,8 +2,8 @@ import threading
 from collections import defaultdict
 import cv2
 import tkinter as tk
-from CoordinatePorte_170724 import _170724 as date
-from CoordinatePorte_040924 import _040924
+from CoordinatePorte_170724 import *
+# from CoordinatePorte_040924 import *
 from enum import Enum
 
 from cv2 import Mat
@@ -80,6 +80,7 @@ class Porta:
 
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
+RESULT_ROOT = 'Risultati/'
 OFFSET = 15
 FRAME_PRECEDENTI = 3
 RED = (0, 0, 255)
@@ -161,13 +162,13 @@ def check(track: list[any], array_porte):
     for porta in array_porte:
         (xm, ym) = (porta.x3+porta.x4)/2, (porta.y3+porta.y4)/2
         
-        if porta.tipo == Entrata.ALTO_SX:
+        if porta.tipo.value == Entrata.ALTO_SX.value:
             segno_os = [-1, -1, 1, 1]
-        elif porta.tipo == Entrata.ALTO_DX:
+        elif porta.tipo.value == Entrata.ALTO_DX.value:
             segno_os = [1, -1, -1, 1] 
-        elif porta.tipo == Entrata.BASSO_SX:
+        elif porta.tipo.value == Entrata.BASSO_SX.value:
             segno_os = [-1, 1, 1, -1]     
-        elif porta.tipo == Entrata.BASSO_DX:
+        elif porta.tipo.value == Entrata.BASSO_DX.value:
             segno_os = [1, 1, -1, -1]
         
         vertici_full = [
@@ -204,25 +205,33 @@ def run_tracker_in_thread(filename, model, file_index):
     mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
     # Define the codec and create a VideoWriter object
     fourcc = cv2.VideoWriter.fourcc(*'mp4v')
-    out_name = 'track_' + str(filename + '.mp4')
+    out_name = str(RESULT_ROOT + filename + '_track.mp4')
     
-    match filename:
-        case '1-Inizio':
-            array_porte = date.PORTE_Inizio
-        case '2-PonteDestra' | '2-PonteDestraShort':
-            array_porte = date.PORTE_PonteDestra
-        case '3-PonteSinistra':
-            array_porte = date.PORTE_PonteSinistra
-        case '4-BalconeAvanti':
-            array_porte = date.PORTE_BalconeAvanti
-        case '5-LungoCanale':
-            array_porte = date.PORTE_LungoCanale
-        case '6-Arrivo':
-            array_porte = date.PORTE_Arrivo
+    try:
+        match filename:
+            case '1-Inizio':
+                array_porte = PORTE_Inizio
+            case '2-PonteDestra' | '2-PonteDestraShort':
+                array_porte = PORTE_PonteDestra
+            case '3-PonteSinistra':
+                array_porte = PORTE_PonteSinistra
+            case '4-BalconeDietro':
+                array_porte = PORTE_BalconeDietro
+            case '4-BalconeAvanti':
+                array_porte = PORTE_BalconeAvanti
+            case '5-LungoCanale':
+                array_porte = PORTE_LungoCanale
+            case '6-Arrivo':
+                array_porte = PORTE_Arrivo
+    except NameError:
+        pass
 
                 
-    # out = cv2.VideoWriter(out_name, fourcc, cap.get(cv2.CAP_PROP_FPS), (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-    # int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    # out = cv2.VideoWriter(
+    #     out_name, fourcc,
+    #     cap.get(cv2.CAP_PROP_FPS),
+    #     (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+    #     int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     frame_num = 1
     frame_count_pass = 1
     while cap.isOpened() and frame is not None:
@@ -265,8 +274,12 @@ def run_tracker_in_thread(filename, model, file_index):
                     frame[maschera] = annotated_frame[maschera]
                     
             fontsize = 2
-            for porta in array_porte:
-                frame = porta.draw(frame)
+            
+            try:
+                for porta in array_porte:
+                    frame = porta.draw(frame)
+            except UnboundLocalError:
+                pass
             
             cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
@@ -288,7 +301,7 @@ def run_tracker_in_thread(filename, model, file_index):
                     frame_count_pass = 1
                 
             frame = cv2.resize(frame, (scr_width, scr_height))
-            cv2.imshow(out_name, frame,)
+            cv2.imshow(out_name, frame)
             # Write the frame to the output file
             # out.write(frame)
             frame_num += 1
@@ -313,7 +326,8 @@ inizio = '1-Inizio'
 ponteDestra = '2-PonteDestra'
 ponteDestraShort = '2-PonteDestraShort'
 ponteSinistra = '3-PonteSinistra'
-balconeAvanti = '4-BalconeAvanti'
+balconeDietro = '4a-BalconeDietro'
+balconeAvanti = '4b-BalconeAvanti'
 lungoCanale = '5-LungoCanale'
 arrivo = '6-Arrivo'
 
