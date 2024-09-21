@@ -16,6 +16,11 @@ class Entrata(Enum): # Verso di ENTRATA nella porta
     ALTO_DX = 1,
     BASSO_SX = 2,
     BASSO_DX = 3,
+    
+class Passato(Enum): 
+    NON_PASSATO = 0,
+    PASSATO = 1,
+    PASSATO_MALE = 2,
 
 
 class Porta:
@@ -110,6 +115,44 @@ def is_point_in_rotated_rectangle(xp, yp, vertices):
         return True
     else:
         return False
+    
+def check_orientation(pos_corrente,pos_precedente, porta: Porta)->int:
+    if porta.color == GREEN:
+        match porta.tipo.value:
+            case Entrata.ALTO_SX.value:
+                if pos_corrente[0]>=pos_precedente[0] & pos_corrente[1]>=pos_precedente[1]:
+                    return Passato.PASSATO.value
+                return Passato.PASSATO_MALE.value
+            case Entrata.ALTO_DX.value:
+                if pos_corrente[0]<=pos_precedente[0] & pos_corrente[1]>=pos_precedente[1]:
+                    return Passato.PASSATO.value
+                return Passato.PASSATO_MALE.value
+            case Entrata.BASSO_SX.value:
+                if pos_corrente[0]>=pos_precedente[0] & pos_corrente[1]<=pos_precedente[1]:
+                    return Passato.PASSATO.value
+                return Passato.PASSATO_MALE.value
+            case Entrata.BASSO_DX.value:
+                if pos_corrente[0]<=pos_precedente[0] & pos_corrente[1]<=pos_precedente[1]:
+                    return Passato.PASSATO.value
+                return Passato.PASSATO_MALE.value
+    else:   
+        match porta.tipo.value:
+            case Entrata.ALTO_SX.value:
+                if pos_corrente[0]>=pos_precedente[0] & pos_corrente[1]>=pos_precedente[1]:
+                    return Passato.PASSATO_MALE.value
+                return Passato.PASSATO.value
+            case Entrata.ALTO_DX.value:
+                if pos_corrente[0]<=pos_precedente[0] & pos_corrente[1]>=pos_precedente[1]:
+                    return Passato.PASSATO_MALE.value
+                return Passato.PASSATO.value
+            case Entrata.BASSO_SX.value:
+                if pos_corrente[0]>=pos_precedente[0] & pos_corrente[1]<=pos_precedente[1]:
+                    return Passato.PASSATO_MALE.value
+                return Passato.PASSATO.value
+            case Entrata.BASSO_DX.value:
+                if pos_corrente[0]<=pos_precedente[0] & pos_corrente[1]<=pos_precedente[1]:
+                    return Passato.PASSATO_MALE.value
+                return Passato.PASSATO.value
 
 
 def check(track: list[any], array_porte):
@@ -139,9 +182,10 @@ def check(track: list[any], array_porte):
         if (is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_px)):
             for i in range(1, FRAME_PRECEDENTI + 1):
                 if (is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax)):
-                    return (True, porta.numero)
+                    
+                    return (check_orientation(track_rev[0],track_rev[2], porta), porta.numero)
                 
-    return None
+    return Passato.NON_PASSATO.value
 
 
 def run_tracker_in_thread(filename, model, file_index):
@@ -227,9 +271,17 @@ def run_tracker_in_thread(filename, model, file_index):
             cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
             
-            if passed is not None: 
+            
+            if passed[0] == Passato.PASSATO.value: 
                 cv2.putText(frame, 'Porta ' + str(passed[1]), (frame.shape[1]*3//4 + 10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
+                frame_count_pass += 1
+                if frame_count_pass >= 3:
+                    passed = None
+                    frame_count_pass = 1
+            elif passed[0] == Passato.PASSATO_MALE.value:
+                cv2.putText(frame, 'Porta ' + str(passed[1]), (frame.shape[1]*3//4 + 10, frame.shape[0] - (40 * fontsize)),
+                        cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
                 frame_count_pass += 1
                 if frame_count_pass >= 3:
                     passed = None
