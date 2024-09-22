@@ -2,7 +2,7 @@ from TracciamentoOggetto_v3 import Porta, Entrata, GREEN, RED
 
 PORTE_Inizio: list[Porta] = []
 
-PORTE_PonteDestra: list[Porta] = [ #17/07/24
+PORTE_PonteDestra: list[Porta] = [
     Porta(x1=1342, y1=592, x2=1491, y2=499, x3=1331, y3=796, x4=1468, y4=762, color=GREEN, numero=30, tipo=Entrata.ALTO_SX),
     Porta(x1=1526, y1=483, x2=1600, y2=462, x3=1517, y3=666, x4=1594, y4=640, color=GREEN, numero=29, tipo=Entrata.ALTO_SX),
     Porta(x1=1219, y1=496, x2=1321, y2=457, x3=1209, y3=676, x4=1316, y4=647, color=GREEN, numero=28, tipo=Entrata.ALTO_SX),
@@ -13,47 +13,51 @@ PORTE_PonteDestra: list[Porta] = [ #17/07/24
 ]
 
 PORTE_PonteSinistra: list[Porta] = [
-    Porta(x1=1170, y1=193, x2=519, y2=197, x3=1139, y3=875, x4=575, y4=957, color=GREEN, numero=31, tipo=Entrata.BASSO_SX),
-    Porta(x1=935, y1=100, x2=1239, y2=199, x3=1226, y3=417, x4=941, y4=453, color=RED, numero=33, tipo=Entrata.BASSO_SX),
-    Porta(x1=1596, y1=93, x2=1406, y2=73, x3=1580, y3=316, x4=1398, y4=317, color=GREEN, numero=34, tipo=Entrata.BASSO_SX),
-    Porta(x1=508, y1=146, x2=343, y2=168, x3=511, y3=300, x4=350, y4=318, color=GREEN, numero=35, tipo=Entrata.BASSO_SX),
-    Porta(x1=1087, y1=110, x2=981, y2=123, x3=1086, y3=258, x4=982, y4=271, color=GREEN, numero=36, tipo=Entrata.BASSO_SX),
-    Porta(x1=971, y1=112, x2=855, y2=118, x3=971, y3=241, x4=858, y4=248, color=GREEN, numero=37, tipo=Entrata.BASSO_SX),
-    Porta(x1=667, y1=113, x2=573, y2=118, x3=667, y3=250, x4=577, y4=250, color=RED, numero=38, tipo=Entrata.BASSO_SX),
-    Porta(x1=261, y1=121, x2=154, y2=127, x3=265, y3=248, x4=158, y4=250, color=RED, numero=39, tipo=Entrata.BASSO_SX),
-    Porta(x1=743, y1=78, x2=658, y2=75, x3=745, y3=172, x4=657, y4=173, color=GREEN, numero=40, tipo=Entrata.BASSO_SX)
+    Porta(x1=1217, y1=264, x2=400, y2=230, x3=1152, y3=1080, x4=413, y4=1080, color=GREEN, numero=31, tipo=Entrata.BASSO_SX),
+    Porta(x1=665, y1=119, x2=315, y2=68, x3=653, y3=482, x4=321, y4=459, color=RED, numero=33, tipo=Entrata.BASSO_SX),
+    Porta(x1=1355, y1=114, x2=1151, y2=65, x3=1338, y3=355, x4=1132, y4=325, color=GREEN, numero=34, tipo=Entrata.BASSO_SX),
+    Porta(x1=497, y1=152, x2=330, y2=159, x3=493, y3=296, x4=328, y4=300, color=GREEN, numero=35, tipo=Entrata.BASSO_SX),
+    Porta(x1=589, y1=133, x2=462, y2=135, x3=585, y3=287, x4=493, y4=297, color=GREEN, numero=36, tipo=Entrata.BASSO_SX),
+    Porta(x1=1030, y1=135, x2=916, y2=143, x3=1021, y3=266, x4=911, y4=271, color=GREEN, numero=37, tipo=Entrata.BASSO_SX),
+    Porta(x1=195, y1=116, x2=100, y2=109, x3=193, y3=254, x4=100, y4=244, color=RED, numero=38, tipo=Entrata.BASSO_SX),
+    Porta(x1=640, y1=32, x2=546, y2=92, x3=638, y3=199, x4=540, y4=206, color=GREEN, numero=39, tipo=Entrata.BASSO_SX),
+    Porta(x1=448, y1=80, x2=356, y2=69, x3=446, y3=175, x4=355, y4=173, color=RED, numero=40, tipo=Entrata.BASSO_SX),
 ]
 
 PORTE_BalconeDietro: list[Porta] = [
-  # @TODO
+    Porta(x1=923, y1=381, x2=1030, y2=380, x3=925, y3=547, x4=1031, y4=525, color=GREEN, numero=35, tipo=Entrata.ALTO_SX),
+    Porta(x1=1004, y1=411, x2=1110, y2=402, x3=1001, y3=610, x4=1108, y4=590, color=GREEN, numero=36, tipo=Entrata.ALTO_SX),
+    Porta(x1=447, y1=539, x2=690, y2=533, x3=470, y3=839, x4=701, y4=807, color=GREEN, numero=37, tipo=Entrata.ALTO_SX),
+    Porta(x1=1771, y1=441, x2=1837, y2=421, x3=1762, y3=648, x4=1827, y4=609, color=RED, numero=38, tipo=Entrata.ALTO_SX),
+    Porta(x1=1575, y1=478, x2=1685, y2=477, x3=1560, y3=795, x4=1675, y4=751, color=GREEN, numero=39, tipo=Entrata.ALTO_SX),
 ]
+
 
 PORTE_BalconeAvanti: list[Porta] = [
-    Porta(x1=403, y1=532, x2=303, y2=531, x3=428, y3=767, x4=322, y4=742, color=GREEN, numero=41, tipo=Entrata.BASSO_SX),
-    Porta(x1=789, y1=449, x2=642, y2=448, x3=816, y3=731, x4=662, y4=722, color=GREEN, numero=42, tipo=Entrata.BASSO_SX),
-    Porta(x1=1035, y1=439, x2=910, y2=437, x3=1045, y3=632, x4=918, y4=614, color=GREEN, numero=43, tipo=Entrata.BASSO_SX),
-    Porta(x1=1354, y1=424, x2=1238, y2=407, x3=1358, y3=582, x4=1242, y4=570, color=GREEN, numero=44, tipo=Entrata.BASSO_SX),
-    Porta(x1=1784, y1=434, x2=1663, y2=426, x3=1787, y3=560, x4=1666, y4=569, color=RED, numero=45, tipo=Entrata.BASSO_SX),
-    Porta(x1=1687, y1=406, x2=1594, y2=411, x3=1686, y3=534, x4=1594, y4=530, color=RED, numero=46, tipo=Entrata.BASSO_SX),
-    Porta(x1=1497, y1=397, x2=1411, y2=401, x3=1502, y3=509, x4=1414, y4=504, color=GREEN, numero=47, tipo=Entrata.BASSO_SX)
+    Porta(x1=81, y1=530, x2=34, y2=513, x3=104, y3=743, x4=57, y4=700, color=GREEN, numero=41, tipo=Entrata.BASSO_SX),
+    Porta(x1=1497, y1=594, x2=1259, y2=495, x3=1498, y3=807, x4=1262, y4=796, color=GREEN, numero=42, tipo=Entrata.BASSO_SX),
+    Porta(x1=1127, y1=437, x2=987, y2=438, x3=1134, y3=652, x4=997, y4=631, color=GREEN, numero=43, tipo=Entrata.BASSO_SX),
+    Porta(x1=1563, y1=438, x2=1453, y2=430, x3=1563, y3=575, x4=1456, y4=572, color=GREEN, numero=44, tipo=Entrata.BASSO_SX),
+    Porta(x1=1232, y1=441, x2=1133, y2=426, x3=1234, y3=548, x4=1140, y4=535, color=GREEN, numero=45, tipo=Entrata.BASSO_SX),
+    Porta(x1=1826, y1=399, x2=1726, y2=413, x3=1826, y3=535, x4=1728, y4=537, color=GREEN, numero=46, tipo=Entrata.BASSO_SX),
+    Porta(x1=1452, y1=391, x2=1366, y2=393, x3=1453, y3=499, x4=1368, y4=498, color=RED, numero=47, tipo=Entrata.BASSO_SX),
+    Porta(x1=1688, y1=380, x2=1606, y2=376, x3=1690, y3=477, x4=1606, y4=479, color=GREEN, numero=48, tipo=Entrata.BASSO_SX),
+    Porta(x1=1830, y1=376, x2=1765, y2=380, x3=1830, y3=465, x4=1764, y4=461, color=RED, numero=49, tipo=Entrata.BASSO_SX),
 ]
 
+
 PORTE_LungoCanale: list[Porta] = [
-    Porta(x1=382, y1=418, x2=367, y2=317, x3=386, y3=503, x4=365, y4=463, color=GREEN, numero=50, tipo=Entrata.BASSO_SX),
-    Porta(x1=866, y1=457, x2=796, y2=410, x3=853, y3=651, x4=784, y4=600, color=RED, numero=51, tipo=Entrata.BASSO_SX),
-    Porta(x1=1203, y1=397, x2=1122, y2=356, x3=1186, y3=524, x4=1111, y4=484, color=GREEN, numero=52, tipo=Entrata.BASSO_SX),
-    Porta(x1=1291, y1=294, x2=1234, y2=283, x3=1278, y3=389, x4=1222, y4=373, color=RED, numero=53, tipo=Entrata.BASSO_SX),
-    Porta(x1=1529, y1=384, x2=1444, y2=357, x3=1514, y3=494, x4=1430, y4=466, color=GREEN, numero=54, tipo=Entrata.BASSO_SX),
-    Porta(x1=1604, y1=361, x2=1554, y2=342, x3=1586, y3=454, x4=1538, y4=432, color=GREEN, numero=55, tipo=Entrata.BASSO_SX)
+    Porta(x1=122, y1=497, x2=109, y2=459, x3=145, y3=720, x4=129, y4=643, color=RED, numero=50, tipo=Entrata.BASSO_SX),
+    Porta(x1=515, y1=300, x2=487, y2=277, x3=510, y3=433, x4=483, y4=407, color=RED, numero=51, tipo=Entrata.BASSO_SX),
+    Porta(x1=1007, y1=321, x2=941, y2=303, x3=999, y3=449, x4=931, y4=419, color=RED, numero=52, tipo=Entrata.BASSO_SX),
+    Porta(x1=1319, y1=356, x2=1235, y2=343, x3=1301, y3=459, x4=1223, y4=445, color=RED, numero=53, tipo=Entrata.BASSO_SX),
+    Porta(x1=1620, y1=399, x2=1533, y2=377, x3=1596, y3=513, x4=1512, y4=491, color=RED, numero=54, tipo=Entrata.BASSO_SX),
+    Porta(x1=1384, y1=311, x2=1322, y2=299, x3=1371, y3=410, x4=1309, y4=392, color=RED, numero=55, tipo=Entrata.BASSO_SX),
 ]
 
 PORTE_Arrivo: list[Porta] = [
-    Porta(x1=361, y1=229, x2=436, y2=214, x3=364, y3=308, x4=437, y4=303, color=RED, numero=52, tipo=Entrata.ALTO_SX),
-    Porta(x1=429, y1=266, x2=504, y2=243, x3=429, y3=388, x4=504, y4=364, color=GREEN, numero=54, tipo=Entrata.ALTO_SX),
-    Porta(x1=869, y1=238, x2=922, y2=232, x3=862, y3=353, x4=917, y4=338, color=GREEN, numero=55, tipo=Entrata.ALTO_SX),
-    Porta(x1=873, y1=359, x2=981, y2=344, x3=866, y3=520, x4=965, y4=499, color=RED, numero=56, tipo=Entrata.ALTO_SX),
-    Porta(x1=1275, y1=511, x2=1355, y2=481, x3=1248, y3=671, x4=1334, y4=624, color=GREEN, numero=57, tipo=Entrata.ALTO_SX),
-    Porta(x1=1201, y1=589, x2=1329, y2=548, x3=1175, y3=809, x4=1290, y4=760, color=GREEN, numero=58, tipo=Entrata.ALTO_SX),
-    Porta(x1=1721, y1=476, x2=1750, y2=447, x3=1694, y3=604, x4=1727, y4=568, color=GREEN, numero=59, tipo=Entrata.ALTO_SX),
-    Porta(x1=1718, y1=689, x2=1747, y2=646, x3=1652, y3=888, x4=1697, y4=829, color=GREEN, numero=60, tipo=Entrata.ALTO_SX)
+    Porta(x1=500, y1=201, x2=569, y2=194, x3=502, y3=285, x4=570, y4=272, color=RED, numero=52, tipo=Entrata.ALTO_SX),
+    Porta(x1=478, y1=229, x2=545, y2=227, x3=482, y3=325, x4=546, y4=317, color=RED, numero=53, tipo=Entrata.ALTO_SX),
+    Porta(x1=345, y1=271, x2=426, y2=256, x3=350, y3=398, x4=430, y4=380, color=RED, numero=54, tipo=Entrata.ALTO_SX),
+    Porta(x1=805, y1=249, x2=869, y2=244, x3=803, y3=373, x4=866, y4=359, color=RED, numero=55, tipo=Entrata.ALTO_SX),
 ]
