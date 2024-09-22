@@ -1,4 +1,79 @@
-from TracciamentoOggetto_v3 import Porta, Entrata, GREEN, RED
+from enum import Enum
+import cv2
+from cv2 import Mat
+import numpy as np
+
+class Entrata(Enum): # Verso di ENTRATA nella porta
+    ALTO_SX = 0,
+    ALTO_DX = 1,
+    BASSO_SX = 2,
+    BASSO_DX = 3,
+    
+    
+class Passato(Enum): 
+    NON_PASSATO = 0,
+    PASSATO = 1,
+    PASSATO_MALE = 2,
+
+
+class Porta:
+    color: (int, int, int) # type: ignore
+    numero: int
+    tipo: Entrata
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    x3: float
+    y3: float
+    x4: float
+    y4: float
+
+    def __init__(self, x1=0, y1=0, x2=0, y2=0, x3=0, y3=0, x4=0, y4=0, color=(255, 255, 255), numero=0, tipo=Entrata.ALTO_SX):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.x3 = x3
+        self.y3 = y3
+        self.x4 = x4
+        self.y4 = y4
+        self.color = color
+        self.numero = numero
+        self.tipo = tipo
+
+    def new(self, x1, y1, x2, y2, x3, y3, x4, y4, color: tuple, numero=0, tipo: Entrata = Entrata.ALTO_SX):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+        self.x3 = x3
+        self.y3 = y3
+        self.x4 = x4
+        self.y4 = y4
+        self.color = color
+        self.numero = numero
+        self.tipo = tipo
+
+    def draw(self, img) -> Mat | np.ndarray:
+        pts = np.array([[self.x1, self.y1], [self.x2, self.y2], [self.x4, self.y4], [self.x3, self.y3]], np.int32)
+        pts = pts.reshape((-1, 1, 2))
+
+        # Disegna il rettangolo sull'immagine usando cv2.polylines()
+        cv2.polylines(img, [pts], isClosed=True, color=self.color, thickness=3, lineType=cv2.LINE_8)
+        # cv2.rectangle(img, (self.x1, self.y1), (self.x3, self.y3), self.color, 3)
+        return img
+
+    def width(self):
+        return cv2.sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
+
+    def height(self):
+        return self.y4 - self.y2
+
+
+RED = (0, 0, 255)
+GREEN = (0, 255, 0)
+
 
 PORTE_Inizio: list[Porta] = []
 

@@ -5,89 +5,27 @@ import tkinter as tk
 from CoordinatePorte_170724 import *
 # from CoordinatePorte_040924 import *
 from enum import Enum
+import types
 
-from cv2 import Mat
 from ultralytics import YOLO
 import numpy as np
-
-
-class Entrata(Enum): # Verso di ENTRATA nella porta
-    ALTO_SX = 0,
-    ALTO_DX = 1,
-    BASSO_SX = 2,
-    BASSO_DX = 3,
-    
-class Passato(Enum): 
-    NON_PASSATO = 0,
-    PASSATO = 1,
-    PASSATO_MALE = 2,
-
-
-class Porta:
-    color: (int, int, int) # type: ignore
-    numero: int
-    tipo: Entrata
-    x1: float
-    y1: float
-    x2: float
-    y2: float
-    x3: float
-    y3: float
-    x4: float
-    y4: float
-
-    def __init__(self, x1=0, y1=0, x2=0, y2=0, x3=0, y3=0, x4=0, y4=0, color=(255, 255, 255), numero=0, tipo=Entrata.ALTO_SX):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        self.x3 = x3
-        self.y3 = y3
-        self.x4 = x4
-        self.y4 = y4
-        self.color = color
-        self.numero = numero
-        self.tipo = tipo
-
-    def new(self, x1, y1, x2, y2, x3, y3, x4, y4, color: tuple, numero=0, tipo: Entrata = Entrata.ALTO_SX):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-        self.x3 = x3
-        self.y3 = y3
-        self.x4 = x4
-        self.y4 = y4
-        self.color = color
-        self.numero = numero
-        self.tipo = tipo
-
-    def draw(self, img) -> Mat | np.ndarray:
-        pts = np.array([[self.x1, self.y1], [self.x2, self.y2], [self.x4, self.y4], [self.x3, self.y3]], np.int32)
-        pts = pts.reshape((-1, 1, 2))
-
-        # Disegna il rettangolo sull'immagine usando cv2.polylines()
-        cv2.polylines(img, [pts], isClosed=True, color=self.color, thickness=3, lineType=cv2.LINE_8)
-        # cv2.rectangle(img, (self.x1, self.y1), (self.x3, self.y3), self.color, 3)
-        return img
-
-    def width(self):
-        return cv2.sqrt((self.x2 - self.x1) ** 2 + (self.y2 - self.y1) ** 2)
-
-    def height(self):
-        return self.y4 - self.y2
-
 
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 OFFSET = 15
 FRAME_PRECEDENTI = 3
-RED = (0, 0, 255)
-GREEN = (0, 255, 0)
-# Tutte le coordinate sono state prese con immagini di risoluzione 1920x972, con offset di +54px
-# Le coordinate fanno riferimento alle porte posizionate in data 4 settembre 2024
 
+# Define the video files and the masks for the trackers
+fn = types.SimpleNamespace()
+fn.inizio = '1-Inizio'
+fn.ponteDestra = '2-PonteDestra'
+fn.ponteDestraShort = '2-PonteDestraShort'
+fn.ponteSinistra = '3-PonteSinistra'
+fn.balconeDietro = '4a-BalconeDietro'
+fn.balconeAvanti = '4-BalconeAvanti'
+fn.lungoCanale = '5-LungoCanale'
+fn.arrivo = '6-Arrivo'
 
 def get_screen_size():
     root = tk.Tk()
@@ -209,19 +147,19 @@ def run_tracker_in_thread(filename, model, file_index):
     
     try:
         match filename:
-            case '1-Inizio':
+            case fn.inizio:
                 array_porte = PORTE_Inizio
-            case '2-PonteDestra' | '2-PonteDestraShort':
+            case fn.ponteDestra | fn.ponteDestraShort:
                 array_porte = PORTE_PonteDestra
-            case '3-PonteSinistra':
+            case fn.ponteSinistra:
                 array_porte = PORTE_PonteSinistra
-            case '4-BalconeDietro':
+            case fn.balconeDietro:
                 array_porte = PORTE_BalconeDietro
-            case '4-BalconeAvanti':
+            case fn.balconeAvanti:
                 array_porte = PORTE_BalconeAvanti
-            case '5-LungoCanale':
+            case fn.lungoCanale:
                 array_porte = PORTE_LungoCanale
-            case '6-Arrivo':
+            case fn.arrivo:
                 array_porte = PORTE_Arrivo
     except NameError:
         pass
@@ -282,17 +220,16 @@ def run_tracker_in_thread(filename, model, file_index):
                 pass
             
             cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
-                        cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
+                        cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
             
-            
-            if passed[0] == Passato.PASSATO.value: 
+            if passed is not None and passed[0] == Passato.PASSATO.value: 
                 cv2.putText(frame, 'Porta ' + str(passed[1]), (frame.shape[1]*3//4 + 10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
                 frame_count_pass += 1
                 if frame_count_pass >= 3:
                     passed = None
                     frame_count_pass = 1
-            elif passed[0] == Passato.PASSATO_MALE.value:
+            elif passed is not None and passed[0] == Passato.PASSATO_MALE.value:
                 cv2.putText(frame, 'Porta ' + str(passed[1]), (frame.shape[1]*3//4 + 10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
                 frame_count_pass += 1
@@ -321,24 +258,14 @@ def run_tracker_in_thread(filename, model, file_index):
 model1 = YOLO("yolov9e-seg.pt")
 model2 = YOLO("yolov9e-seg.pt")
 
-# Define the video files and the masks for the trackers
-inizio = '1-Inizio'
-ponteDestra = '2-PonteDestra'
-ponteDestraShort = '2-PonteDestraShort'
-ponteSinistra = '3-PonteSinistra'
-balconeDietro = '4a-BalconeDietro'
-balconeAvanti = '4b-BalconeAvanti'
-lungoCanale = '5-LungoCanale'
-arrivo = '6-Arrivo'
-
 # Create the tracker threads
-tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(ponteDestra, model1, 1), daemon=True)
-# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(ponteDestra, model1, 2), daemon=True)
-# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(ponteSinistra, model1, 3), daemon=True)
-# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(balconeDietro, model1, 4), daemon=True)
-# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(balconeAvanti, model1, 4), daemon=True)
-# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(lungoCanale, model1, 5), daemon=True)
-# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(arrivo, model1, 6), daemon=True)
+tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 1), daemon=True)
+# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, model1, 2), daemon=True)
+# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
+# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 4), daemon=True)
+# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 4), daemon=True)
+# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, model1, 5), daemon=True)
+# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 6), daemon=True)
 
 # Start the tracker threads
 tracker_thread1.start()
