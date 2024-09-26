@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a5e6a70-1a00-42eb-bb8e-bc1024dee222" name="Changes" comment="Aggiustati i box delle porte">
-      <change afterPath="$PROJECT_DIR$/IstantaneeCamere/170724/2-PonteDestra.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Risultati/porte.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/porte.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" beforeDir="false" afterPath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +47,7 @@
     "Python.TracciamentoOggetto_v2.executor": "Run",
     "Python.TracciamentoOggetto_v3.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Merging main",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -81,7 +81,7 @@
       <workItem from="1723622599393" duration="1677000" />
       <workItem from="1725357126625" duration="777000" />
       <workItem from="1725957744566" duration="15018000" />
-      <workItem from="1727338407607" duration="23657000" />
+      <workItem from="1727338407607" duration="24051000" />
     </task>
     <task id="LOCAL-00001" summary="Aggiunto maschere e porte per il video dalla camera : PonteDestra">
       <option name="closed" value="true" />
