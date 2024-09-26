@@ -7,7 +7,7 @@ from CoordinatePorte_170724 import *
 # from CoordinatePorte_040924 import *
 from enum import Enum
 import types
-
+import torch
 from ultralytics import YOLO
 import numpy as np
 
@@ -200,7 +200,7 @@ def run_tracker_in_thread(filename, model, file_index):
                         if len(track) > 160:  # retain 90 tracks for 160 frames
                             track.pop(0)
 
-                        # Checks if the player has passed through a door 
+                        # Checks if the player has passed through a door
                         if (len(track) >= FRAME_PRECEDENTI + 1):
                             passed = check(track, array_porte)
 
@@ -257,7 +257,8 @@ def run_tracker_in_thread(filename, model, file_index):
 
 
 # Load the models
-model1 = YOLO("yolov9e-seg.pt")
+# model1 = YOLO("yolov9e-seg.pt")
+model1 = torch.hub.load("yolov9e-seg.pt", "yolov9e-seg",pretrained=True).cuda()
 model2 = YOLO("yolov9e-seg.pt")
 
 # Create the tracker threads
