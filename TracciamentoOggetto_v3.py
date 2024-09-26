@@ -266,7 +266,7 @@ def run_tracker_in_thread(filename, model, file_index):
                     passed = None
                     frame_count_pass = 1
 
-            frame = cv2.resize(frame, (scr_width, scr_height))
+            frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             # cv2.imshow(out_name, frame)
             # Write the frame to the output file
             out.write(frame)
