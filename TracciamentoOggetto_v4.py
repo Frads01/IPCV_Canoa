@@ -13,7 +13,7 @@ import numpy as np
 
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
-RESULT_ROOT = 'Risultati/'
+RESULT_ROOT = 'RisultatiGPU/'
 OFFSET = 15
 FRAME_PRECEDENTI = 3
 
@@ -197,8 +197,8 @@ def run_tracker_in_thread(filename, model, file_index):
                         track = track_history[track_id]
 
                         track.append((int(x), int(y)))  # x, y center point
-                        if len(track) > 160:  # retain 90 tracks for 160 frames
-                            track.pop(0)
+                        # if len(track) > 160:  # retain 90 tracks for 160 frames
+                        #     track.pop(0)
 
                         # Checks if the player has passed through a door
                         if (len(track) >= FRAME_PRECEDENTI + 1):
@@ -257,8 +257,15 @@ def run_tracker_in_thread(filename, model, file_index):
 
 
 # Load the models
-# model1 = YOLO("yolov9e-seg.pt")
-model1 = torch.hub.load("yolov9e-seg.pt", "yolov9e-seg",pretrained=True).cuda()
+
+print(torch.cuda.device_count())
+print(torch._C._cuda_getDriverVersion())
+
+model1 = YOLO("yolov8x-seg.pt")
+if torch.cuda.is_available():
+    print("CUDA is available")
+    model1.to('cuda')
+
 model2 = YOLO("yolov9e-seg.pt")
 
 # Create the tracker threads
@@ -272,7 +279,7 @@ tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.balcon
 # tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 6), daemon=True)
 
 # Start the tracker threads
-tracker_thread1.start()
+# tracker_thread1.start()
 timer1 = time.time()
 # tracker_thread2.start()
 # tracker_thread3.start()
