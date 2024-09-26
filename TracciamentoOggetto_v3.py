@@ -155,10 +155,10 @@ def run_tracker_in_thread(filename, model, file_index):
     mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
     # Define the codec and create a VideoWriter object
 
-    fourcc = cv2.VideoWriter.fourcc('m', 'p', '4', 'v')
     out_name = str(RESULT_ROOT + filename + '_track.mp4')
     out = cv2.VideoWriter(
-        out_name, fourcc,
+        out_name,
+        cv2.VideoWriter.fourcc('m','p','4','v'),
         cap.get(cv2.CAP_PROP_FPS),
         (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
@@ -166,8 +166,6 @@ def run_tracker_in_thread(filename, model, file_index):
 
     if not os.path.exists(track_file_path):
         print(f"File '{track_file_path}' creato.")
-    else:
-        print(f"File '{track_file_path}' esiste già.")
 
     file_track = open(track_file_path, 'w')
     try:
@@ -217,7 +215,7 @@ def run_tracker_in_thread(filename, model, file_index):
                         x, y, w, h = box
                         track = track_history[track_id]
 
-                        file_track.write(str(f"{track_id}\t: {int(x)}, \t {int(y)} \n"))
+                        file_track.write(str(f"Frame {frame_num} - ID {track_id}:\t{int(x)},\t{int(y)} \n"))
 
                         track.append((int(x), int(y)))  # x, y center point
                         # if len(track) > 160:  # retain 90 tracks for 160 frames
