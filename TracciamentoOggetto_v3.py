@@ -1,3 +1,4 @@
+import math
 import os
 import threading
 import time
@@ -13,7 +14,7 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
-OFFSET = 15
+OFFSET = 5
 FRAME_PRECEDENTI = 3
 
 # Define the video files and the masks for the trackers
@@ -45,22 +46,46 @@ def get_screen_size():
     return width, height
 
 
-def cross_product(xa, ya, xb, yb):
-    return xa * yb - ya * xb
-
-
 def is_point_in_rotated_rectangle(xp, yp, vertices):
     x1, y1 = vertices[0]
     x2, y2 = vertices[1]
     x3, y3 = vertices[2]
     x4, y4 = vertices[3]
 
-    cp1 = cross_product(x2 - x1, y2 - y1, xp - x1, yp - y1)
-    cp2 = cross_product(x3 - x2, y3 - y2, xp - x2, yp - y2)
-    cp3 = cross_product(x4 - x3, y4 - y3, xp - x3, yp - y3)
-    cp4 = cross_product(x1 - x4, y1 - y4, xp - x4, yp - y4)
+    # Calcola il centro del rettangolo (media delle coordinate dei vertici)
+    xc = (x1 + x2 + x3 + x4) / 4
+    yc = (y1 + y2 + y3 + y4) / 4
 
-    if (cp1 > 0 and cp2 > 0 and cp3 > 0 and cp4 > 0) or (cp1 < 0 and cp2 < 0 and cp3 < 0 and cp4 < 0):
+    # Trova l'angolo di rotazione usando il lato tra (x1, y1) e (x2, y2)
+    dx = x2 - x1
+    dy = y2 - y1
+    angle = math.atan2(dy, dx)  # Angolo di rotazione del rettangolo rispetto agli assi
+
+    # Funzione per ruotare un punto attorno a un centro
+    def rotate_point(x, y, xc, yc, angle):
+        # Trasla il punto in modo che il centro sia l'origine
+        x_translated = x - xc
+        y_translated = y - yc
+
+        # Applica la rotazione inversa
+        x_rotated = x_translated * math.cos(-angle) - y_translated * math.sin(-angle)
+        y_rotated = x_translated * math.sin(-angle) + y_translated * math.cos(-angle)
+
+        return x_rotated, y_rotated
+
+    # Ruota il punto (xp, yp) attorno al centro del rettangolo
+    x_rot, y_rot = rotate_point(xp, yp, xc, yc, angle)
+
+    # Ruota anche i vertici del rettangolo
+    x1_rot, y1_rot = rotate_point(x1, y1, xc, yc, angle)
+    x2_rot, y2_rot = rotate_point(x2, y2, xc, yc, angle)
+
+    # Determina i limiti del rettangolo ruotato
+    width = math.dist((x1_rot, y1_rot), (x2_rot, y2_rot))  # Distanza tra (x1, y1) e (x2, y2)
+    height = math.dist((x1_rot, y1_rot), (x4, y4))  # Distanza tra (x1, y1) e (x4, y4)
+
+    # Verifica se il punto ruotato si trova all'interno del rettangolo allineato
+    if -width / 2 <= x_rot <= width / 2 and -height / 2 <= y_rot <= height / 2:
         return True
     else:
         return False
@@ -70,37 +95,37 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
     if porta.color == GREEN:
         match porta.tipo.value:
             case Entrata.ALTO_SX.value:
-                if pos_corrente[0] >= pos_precedente[0] & pos_corrente[1] >= pos_precedente[1]:
+                if pos_corrente[0] >= pos_precedente[0] and pos_corrente[1] >= pos_precedente[1]:
                     return Passato.PASSATO.value
                 return Passato.PASSATO_MALE.value
             case Entrata.ALTO_DX.value:
-                if pos_corrente[0] <= pos_precedente[0] & pos_corrente[1] >= pos_precedente[1]:
+                if pos_corrente[0] <= pos_precedente[0] and pos_corrente[1] >= pos_precedente[1]:
                     return Passato.PASSATO.value
                 return Passato.PASSATO_MALE.value
             case Entrata.BASSO_SX.value:
-                if pos_corrente[0] >= pos_precedente[0] & pos_corrente[1] <= pos_precedente[1]:
+                if pos_corrente[0] >= pos_precedente[0] and pos_corrente[1] <= pos_precedente[1]:
                     return Passato.PASSATO.value
                 return Passato.PASSATO_MALE.value
             case Entrata.BASSO_DX.value:
-                if pos_corrente[0] <= pos_precedente[0] & pos_corrente[1] <= pos_precedente[1]:
+                if pos_corrente[0] <= pos_precedente[0] and pos_corrente[1] <= pos_precedente[1]:
                     return Passato.PASSATO.value
                 return Passato.PASSATO_MALE.value
     else:
         match porta.tipo.value:
             case Entrata.ALTO_SX.value:
-                if pos_corrente[0] >= pos_precedente[0] & pos_corrente[1] >= pos_precedente[1]:
+                if pos_corrente[0] >= pos_precedente[0] and pos_corrente[1] >= pos_precedente[1]:
                     return Passato.PASSATO_MALE.value
                 return Passato.PASSATO.value
             case Entrata.ALTO_DX.value:
-                if pos_corrente[0] <= pos_precedente[0] & pos_corrente[1] >= pos_precedente[1]:
+                if pos_corrente[0] <= pos_precedente[0] and pos_corrente[1] >= pos_precedente[1]:
                     return Passato.PASSATO_MALE.value
                 return Passato.PASSATO.value
             case Entrata.BASSO_SX.value:
-                if pos_corrente[0] >= pos_precedente[0] & pos_corrente[1] <= pos_precedente[1]:
+                if pos_corrente[0] >= pos_precedente[0] and pos_corrente[1] <= pos_precedente[1]:
                     return Passato.PASSATO_MALE.value
                 return Passato.PASSATO.value
             case Entrata.BASSO_DX.value:
-                if pos_corrente[0] <= pos_precedente[0] & pos_corrente[1] <= pos_precedente[1]:
+                if pos_corrente[0] <= pos_precedente[0] and pos_corrente[1] <= pos_precedente[1]:
                     return Passato.PASSATO_MALE.value
                 return Passato.PASSATO.value
 
@@ -110,6 +135,9 @@ def check(track: list[any], array_porte):
     track_rev = track.copy()
     track_rev.reverse()
     for porta in array_porte:
+        if porte_passate[porta.numero - 1][1] != Passato.NON_PASSATO.value[0]:
+            continue
+
         (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
 
         if porta.tipo.value == Entrata.ALTO_SX.value:
@@ -123,7 +151,7 @@ def check(track: list[any], array_porte):
 
         vertici_full = [
             (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-            (porta.x4 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
+            (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
             (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
             (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
         ]
@@ -133,9 +161,9 @@ def check(track: list[any], array_porte):
         if (is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_px)):
             for i in range(1, FRAME_PRECEDENTI + 1):
                 if (is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax)):
-                    return (check_orientation(track_rev[0], track_rev[2], porta), porta.numero)
+                    return (check_orientation(track_rev[0], track_rev[2], porta)[0], porta.numero)
 
-    return Passato.NON_PASSATO.value
+    return (Passato.NON_PASSATO.value,0)
 
 
 def run_tracker_in_thread(filename, model, file_index):
@@ -201,8 +229,7 @@ def run_tracker_in_thread(filename, model, file_index):
 
             # Esegui l'inferenza
             results = model.track(roi, persist=True, conf=conf, iou=iou, show=False, classes=[0], tracker=tracker)
-            x = 0
-            y = 0
+            x = y = 0
             for result in results:
                 if result.boxes.id is not None:
                     # Get the boxes and track IDs
@@ -243,25 +270,25 @@ def run_tracker_in_thread(filename, model, file_index):
             cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
-            if passed is not None and passed[0] == Passato.PASSATO.value:
+            if passed is not None and passed[0] == Passato.PASSATO.value[0]:
                 # cv2.putText(frame, 'Porta ' + str(passed[1]),
                 #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
                 #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
                 frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
-                    porte_passate[passed[1]] = (porte_passate[passed[1]][0], passed[0], (int(x), int(y)))
+                    porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
                 if frame_count_pass >= 3:
                     passed = None
                     frame_count_pass = 1
-            elif passed is not None and passed[0] == Passato.PASSATO_MALE.value:
+            elif passed is not None and passed[0] == Passato.PASSATO_MALE.value[0]:
                 # cv2.putText(frame, 'Porta ' + str(passed[1]),
                 #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
                 #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
                 frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
-                    porte_passate[passed[1]] = (porte_passate[passed[1]][0], passed[0], (int(x), int(y)))
+                    porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
                 if frame_count_pass >= 3:
                     passed = None
                     frame_count_pass = 1
@@ -332,15 +359,15 @@ else:
 file_porte = open(porte_file_path, 'w')
 
 for porta in porte_passate:
-    if porta[1] == Passato.PASSATO_MALE.value:
+    if porta[1] == Passato.PASSATO_MALE.value[0]:
         print(f"nella porta {porta[0]} l'atleta è Passato male")
-        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
-    elif porta[1] == Passato.PASSATO.value:
+        file_porte.write(str(f"{porta[0]},\t{porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
+    elif porta[1] == Passato.PASSATO.value[0]:
         print(f"nella porta {porta[0]} l'atleta è Passato correttamente")
-        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
+        file_porte.write(str(f"{porta[0]}, {porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
     else:
         print(f"nella porta {porta[0]} l'atleta non è Passato")
-        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
+        file_porte.write(str(f"{porta[0]}, {porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
 
 # Clean up and close windows
 file_porte.close()
