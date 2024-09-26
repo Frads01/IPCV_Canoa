@@ -1,11 +1,10 @@
+import os
 import threading
 import time
 from collections import defaultdict
-import cv2
 import tkinter as tk
 from CoordinatePorte_170724 import *
 # from CoordinatePorte_040924 import *
-from enum import Enum
 import types
 
 from ultralytics import YOLO
@@ -27,6 +26,15 @@ fn.balconeDietro = '4a-BalconeDietro'
 fn.balconeAvanti = '4-BalconeAvanti'
 fn.lungoCanale = '5-LungoCanale'
 fn.arrivo = '6-Arrivo'
+
+# Results
+# Array di tuple (int, int), dove il primo elemento è numerato da 1 a 60
+porte_passate = [(i, 0, (0, 0)) for i in range(1, 61)]
+# il primo valore è il numero della porta, il secodo è l'enum che indica se passato o meno,
+# mentre la tupla indica la posizione in cui si è rilevato il passaggio
+
+# Creare un lock per sincronizzare l'accesso all'array
+porte_passate_lock = threading.Lock()
 
 
 def get_screen_size():
@@ -98,6 +106,7 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
 
 
 def check(track: list[any], array_porte):
+    global segno_os
     track_rev = track.copy()
     track_rev.reverse()
     for porta in array_porte:
@@ -130,6 +139,7 @@ def check(track: list[any], array_porte):
 
 
 def run_tracker_in_thread(filename, model, file_index):
+    global array_porte
     passed = None
     scr_width, scr_height = get_screen_size()
 
@@ -144,9 +154,22 @@ def run_tracker_in_thread(filename, model, file_index):
     mask = mask // 255
     mask = np.repeat(mask[:, :, np.newaxis], 3, axis=2)
     # Define the codec and create a VideoWriter object
-    fourcc = cv2.VideoWriter.fourcc(*'mp4v')
-    out_name = str(RESULT_ROOT + filename + '_track.mp4')
 
+    fourcc = cv2.VideoWriter.fourcc('m', 'p', '4', 'v')
+    out_name = str(RESULT_ROOT + filename + '_track.mp4')
+    out = cv2.VideoWriter(
+        out_name, fourcc,
+        cap.get(cv2.CAP_PROP_FPS),
+        (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+
+    track_file_path = str(RESULT_ROOT + filename + '_track.txt')
+
+    if not os.path.exists(track_file_path):
+        print(f"File '{track_file_path}' creato.")
+    else:
+        print(f"File '{track_file_path}' esiste già.")
+
+    file_track = open(track_file_path, 'w')
     try:
         match filename:
             case fn.inizio:
@@ -166,13 +189,10 @@ def run_tracker_in_thread(filename, model, file_index):
     except NameError:
         pass
 
-    out = cv2.VideoWriter(
-        out_name, fourcc,
-        cap.get(cv2.CAP_PROP_FPS),
-        (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     frame_num = 1
     frame_count_pass = 1
     while cap.isOpened() and frame is not None:
+        print(str(f"thread {file_index} : frame {frame_num}"))
         # Read a frame from the video
         roi = frame * mask
         if success:
@@ -183,7 +203,8 @@ def run_tracker_in_thread(filename, model, file_index):
 
             # Esegui l'inferenza
             results = model.track(roi, persist=True, conf=conf, iou=iou, show=False, classes=[0], tracker=tracker)
-
+            x = 0
+            y = 0
             for result in results:
                 if result.boxes.id is not None:
                     # Get the boxes and track IDs
@@ -196,9 +217,11 @@ def run_tracker_in_thread(filename, model, file_index):
                         x, y, w, h = box
                         track = track_history[track_id]
 
+                        file_track.write(str(f"{track_id}\t: {int(x)}, \t {int(y)} \n"))
+
                         track.append((int(x), int(y)))  # x, y center point
-                        if len(track) > 160:  # retain 90 tracks for 160 frames
-                            track.pop(0)
+                        # if len(track) > 160:  # retain 90 tracks for 160 frames
+                        #    track.pop(0)
 
                         # Checks if the player has passed through a door 
                         if (len(track) >= FRAME_PRECEDENTI + 1):
@@ -223,18 +246,24 @@ def run_tracker_in_thread(filename, model, file_index):
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
             if passed is not None and passed[0] == Passato.PASSATO.value:
-                cv2.putText(frame, 'Porta ' + str(passed[1]),
-                            (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
+                # cv2.putText(frame, 'Porta ' + str(passed[1]),
+                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
+                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
                 frame_count_pass += 1
+                with porte_passate_lock:
+                    print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
+                    porte_passate[passed[1]] = (porte_passate[passed[1]][0], passed[0], (int(x), int(y)))
                 if frame_count_pass >= 3:
                     passed = None
                     frame_count_pass = 1
             elif passed is not None and passed[0] == Passato.PASSATO_MALE.value:
-                cv2.putText(frame, 'Porta ' + str(passed[1]),
-                            (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
+                # cv2.putText(frame, 'Porta ' + str(passed[1]),
+                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
+                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
                 frame_count_pass += 1
+                with porte_passate_lock:
+                    print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
+                    porte_passate[passed[1]] = (porte_passate[passed[1]][0], passed[0], (int(x), int(y)))
                 if frame_count_pass >= 3:
                     passed = None
                     frame_count_pass = 1
@@ -253,6 +282,9 @@ def run_tracker_in_thread(filename, model, file_index):
         success, frame = cap.read()
 
     # Release video sources
+    print(f"Il video {filename}, elaborato dal thread {file_index}, dura {frame_num/cap.get(cv2.CAP_PROP_FPS)} s \n")
+    file_track.close()
+    out.release()
     cap.release()
 
 
@@ -262,8 +294,8 @@ model2 = YOLO("yolov9e-seg.pt")
 
 # Create the tracker threads
 
-tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 1), daemon=True)
-# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, model1, 2), daemon=True)
+# tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, model1, 2), daemon=True)
 # tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
 # tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 4), daemon=True)
 # tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 4), daemon=True)
@@ -271,9 +303,9 @@ tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.balcon
 # tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 6), daemon=True)
 
 # Start the tracker threads
-tracker_thread1.start()
-timer1 = time.time()
-# tracker_thread2.start()
+#tracker_thread1.start()
+tracker_thread2.start()
+timer2 = time.time()
 # tracker_thread3.start()
 # tracker_thread4.start()
 # tracker_thread5.start()
@@ -281,15 +313,37 @@ timer1 = time.time()
 # tracker_thread7.start()
 
 # Wait for the tracker threads to finish
-tracker_thread1.join()
-timer1 = time.time() - timer1
-print("il thread 1 ci ha messo %d secondi", round(timer1,2))
-# tracker_thread2.join()
+#racker_thread1.join()
+
+tracker_thread2.join()
+timer2 = time.time() - timer2
+print(f"il thread 1 ci ha messo {timer2 // 60} minuti e {timer2 % 60} secondi")
 # tracker_thread3.join()
 # tracker_thread4.join()
 # tracker_thread5.join()
 # tracker_thread6.join()
 # tracker_thread7.join()
 
+porte_file_path = str(RESULT_ROOT + 'porte.txt')
+
+if not os.path.exists(porte_file_path):
+    print(f"File '{porte_file_path}' creato.")
+else:
+    print(f"File '{porte_file_path}' esiste già.")
+
+file_porte = open(porte_file_path, 'w')
+
+for porta in porte_passate:
+    if porta[1] == Passato.PASSATO_MALE.value:
+        print(f"nella porta {porta[0]} l'atleta è Passato male")
+        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
+    elif porta[1] == Passato.PASSATO.value:
+        print(f"nella porta {porta[0]} l'atleta è Passato correttamente")
+        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
+    else:
+        print(f"nella porta {porta[0]} l'atleta non è Passato")
+        file_porte.write(str(f"{int(porta[0])}, {int(porta[1])} , {int(porta[2][0])} , {int(porta[2][1])} \n"))
+
 # Clean up and close windows
+file_porte.close()
 cv2.destroyAllWindows()
