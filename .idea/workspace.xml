@@ -5,9 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a5e6a70-1a00-42eb-bb8e-bc1024dee222" name="Changes" comment="Aggiustati i box delle porte">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Risultati/porte.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/porte.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" beforeDir="false" afterPath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,10 +21,33 @@
       </list>
     </option>
   </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SalvatoreGiugliano98&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Frads01/IPCV_Canoa.git&quot;,
+    &quot;accountId&quot;: &quot;6f48fb06-2577-4ff4-b8f5-ad778a4edf63&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -36,33 +59,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.CatturaVideoOnline.executor": "Run",
-    "Python.RiconoscimentoCanoa.executor": "Run",
-    "Python.RilevamentoPorte.executor": "Run",
-    "Python.TakeOnlineVideo.executor": "Run",
-    "Python.TracciamentoOggetto.executor": "Run",
-    "Python.TracciamentoOggetto_v2.executor": "Run",
-    "Python.TracciamentoOggetto_v3.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.CatturaVideoOnline.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RiconoscimentoCanoa.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RilevamentoPorte.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TakeOnlineVideo.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TracciamentoOggetto.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TracciamentoOggetto_v2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.TracciamentoOggetto_v3.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.updates&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
-        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23339.19" />
+        <option value="bundled-python-sdk-0029f7779945-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23339.19" />
       </set>
     </attachedChunks>
   </component>
@@ -81,7 +104,12 @@
       <workItem from="1723622599393" duration="1677000" />
       <workItem from="1725357126625" duration="777000" />
       <workItem from="1725957744566" duration="15018000" />
-      <workItem from="1727338407607" duration="24051000" />
+      <workItem from="1727338407607" duration="24157000" />
+      <workItem from="1727381546257" duration="82000" />
+      <workItem from="1727451560067" duration="308000" />
+      <workItem from="1727452059143" duration="27000" />
+      <workItem from="1727452098765" duration="1000" />
+      <workItem from="1727452360909" duration="1181000" />
     </task>
     <task id="LOCAL-00001" summary="Aggiunto maschere e porte per il video dalla camera : PonteDestra">
       <option name="closed" value="true" />
@@ -131,13 +159,13 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/CanoaSlalom$CatturaVideoOnline.coverage" NAME="CatturaVideoOnline Coverage Results" MODIFIED="1722344877989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanoaSlalom$RiconoscimentoCanoa.coverage" NAME="RiconoscimentoCanoa Coverage Results" MODIFIED="1722423824530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto_v2.coverage" NAME="TracciamentoOggetto_v2 Coverage Results" MODIFIED="1723622746293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto.coverage" NAME="TracciamentoOggetto Coverage Results" MODIFIED="1722430093909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727375346187" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1725983014418" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$TakeOnlineVideo.coverage" NAME="TakeOnlineVideo Coverage Results" MODIFIED="1723623651170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727452704307" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$RilevamentoPorte.coverage" NAME="RilevamentoPorte Coverage Results" MODIFIED="1723622677944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanoaSlalom$RiconoscimentoCanoa.coverage" NAME="RiconoscimentoCanoa Coverage Results" MODIFIED="1722423824530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanoaSlalom$CatturaVideoOnline.coverage" NAME="CatturaVideoOnline Coverage Results" MODIFIED="1722344877989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1725983014418" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto_v2.coverage" NAME="TracciamentoOggetto_v2 Coverage Results" MODIFIED="1723622746293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
