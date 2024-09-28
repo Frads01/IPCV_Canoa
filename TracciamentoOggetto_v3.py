@@ -92,7 +92,7 @@ def is_point_in_rotated_rectangle(xp, yp, vertices):
         return False
 
 
-def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
+def check_orientation(pos_corrente, pos_precedente, porta: Porta):
     if porta.color == GREEN:
         match porta.tipo.value:
             case Entrata.ALTO_SX.value:
@@ -139,7 +139,7 @@ def check(track: list[any], array_porte):
         if porte_passate[porta.numero - 1][1] != Passato.NON_PASSATO.value[0]:
             continue
 
-        (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
+        # (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
 
         if porta.tipo.value == Entrata.ALTO_SX.value:
             segno_os = [-1, -1, 1, 1]
@@ -173,7 +173,6 @@ def run_tracker_in_thread(filename, file_index):
     # for each thread, instead of passing a shared model.
     model = YOLO(MODEL_FN)
 
-    global array_porte
     passed = None
     scr_width, scr_height = get_screen_size()
 
@@ -183,7 +182,6 @@ def run_tracker_in_thread(filename, file_index):
     cap = cv2.VideoCapture(VIDEO_ROOT + filename + '.mp4')  # Read the video file
     success, frame = cap.read()
     numero_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    print(MASK_ROOT + filename + '_Mask.png')
     mask = cv2.imread(MASK_ROOT + filename + '_Mask.png', 0)
     _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
     mask = mask // 255
@@ -268,29 +266,31 @@ def run_tracker_in_thread(filename, file_index):
 
             fontsize = 2
 
-            try:
-                for porta in array_porte:
-                    frame = porta.draw(frame)
-            except UnboundLocalError:
-                pass
+            # try:
+            #     for porta in array_porte:
+            #         frame = porta.draw(frame)
+            # except UnboundLocalError:
+            #     pass
 
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
-            if passed is not None and passed[0] == Passato.PASSATO.value[0]:
-                cv2.putText(frame, 'Porta ' + str(passed[1]),
-                            (10, frame.shape[0] - (40 * fontsize)),
-                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
-                frame_count_pass = 1
-            elif passed is not None and passed[0] == Passato.PASSATO_MALE.value[0]:
-                cv2.putText(frame, 'Porta ' + str(passed[1]),
-                            (10, frame.shape[0] - (40 * fontsize)),
-                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
+            if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
                 frame_count_pass = 1
 
-            if 3 >= frame_count_pass > 0 and passed is not None:
+            if 6 >= frame_count_pass > 0 and passed is not None:
+                if passed[0] == Passato.PASSATO.value[0]:
+                    cv2.putText(frame, 'Passata ' + str(passed[1]),
+                                (10, frame.shape[0] - (40 * fontsize)),
+                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
+                    frame_count_pass = 1
+                elif passed[0] == Passato.PASSATO_MALE.value[0]:
+                    cv2.putText(frame, 'Passata Male ' + str(passed[1]),
+                                (10, frame.shape[0] - (40 * fontsize)),
+                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
+                    frame_count_pass = 1
                 with porte_passate_lock:
-                    print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
+                    print(f"Thread {file_index}: Modifica arrayPorte nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
                 frame_count_pass += 1
             else:
@@ -317,7 +317,7 @@ def run_tracker_in_thread(filename, file_index):
 
 # Create the tracker threads
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, 2), daemon=True)
 tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
 tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
 tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
