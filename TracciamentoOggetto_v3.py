@@ -16,6 +16,7 @@ MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 OFFSET = 5
 FRAME_PRECEDENTI = 3
+MODEL_FN = 'yolov9e-seg.pt'
 
 # Define the video files and the masks for the trackers
 fn = types.SimpleNamespace()
@@ -166,7 +167,12 @@ def check(track: list[any], array_porte):
     return (Passato.NON_PASSATO.value,0)
 
 
-def run_tracker_in_thread(filename, model, file_index):
+def run_tracker_in_thread(filename, file_index):
+    # Instantiate a separate model object within each thread to ensure they do not share state which could
+    # lead to conflicts. This means calling YOLO('yolov8n.pt') inside the run_tracker_in_thread function
+    # for each thread, instead of passing a shared model.
+    model = YOLO(MODEL_FN)
+    
     global array_porte
     passed = None
     scr_width, scr_height = get_screen_size()
@@ -245,10 +251,7 @@ def run_tracker_in_thread(filename, model, file_index):
                         file_track.write(str(f"Frame {frame_num} - ID {track_id}:\t{int(x)},\t{int(y)} \n"))
 
                         track.append((int(x), int(y)))  # x, y center point
-                        # if len(track) > 160:  # retain 90 tracks for 160 frames
-                        #    track.pop(0)
 
-                        # Checks if the player has passed through a door 
                         if (len(track) >= FRAME_PRECEDENTI + 1):
                             passed = check(track, array_porte)
 
@@ -271,27 +274,14 @@ def run_tracker_in_thread(filename, model, file_index):
                         cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
             if passed is not None and passed[0] == Passato.PASSATO.value[0]:
-                # cv2.putText(frame, 'Porta ' + str(passed[1]),
-                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
-                # frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                # if frame_count_pass >= 3:
-                #     passed = None
-                #     frame_count_pass = 1
+
             elif passed is not None and passed[0] == Passato.PASSATO_MALE.value[0]:
-                # cv2.putText(frame, 'Porta ' + str(passed[1]),
-                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
-                # frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                # if frame_count_pass >= 3:
-                #     passed = None
-                #     frame_count_pass = 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             # cv2.imshow(out_name, frame)
@@ -312,42 +302,35 @@ def run_tracker_in_thread(filename, model, file_index):
     out.release()
     cap.release()
 
-
-# Load the models
-model1 = YOLO("yolov9e-seg.pt")
-model2 = YOLO("yolov9e-seg.pt")
-
 # Create the tracker threads
-
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, model1, 2), daemon=True)
-# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
-# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 4), daemon=True)
-# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 4), daemon=True)
-# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, model1, 5), daemon=True)
-# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 6), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
+tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
+tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
+tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
+tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
+tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, 6), daemon=True)
 
 # Start the tracker threads
-#tracker_thread1.start()
+# tracker_thread1.start()
 tracker_thread2.start()
 timer2 = time.time()
-# tracker_thread3.start()
-# tracker_thread4.start()
-# tracker_thread5.start()
-# tracker_thread6.start()
-# tracker_thread7.start()
+tracker_thread3.start()
+tracker_thread4.start()
+tracker_thread5.start()
+tracker_thread6.start()
+tracker_thread7.start()
 
 # Wait for the tracker threads to finish
-#racker_thread1.join()
-
+# tracker_thread1.join()
 tracker_thread2.join()
 timer2 = time.time() - timer2
 print(f"il thread 1 ci ha messo {timer2 // 60} minuti e {timer2 % 60} secondi")
-# tracker_thread3.join()
-# tracker_thread4.join()
-# tracker_thread5.join()
-# tracker_thread6.join()
-# tracker_thread7.join()
+tracker_thread3.join()
+tracker_thread4.join()
+tracker_thread5.join()
+tracker_thread6.join()
+tracker_thread7.join()
 
 porte_file_path = str(RESULT_ROOT + 'porte.txt')
 
