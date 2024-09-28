@@ -14,9 +14,9 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
-RESULT_ROOT = 'Risultati_NOroi/'
 OFFSET = 5
 FRAME_PRECEDENTI = 3
+MODEL_FN = 'yolov9e-seg.pt'
 
 # Define the video files and the masks for the trackers
 fn = types.SimpleNamespace()
@@ -92,7 +92,7 @@ def is_point_in_rotated_rectangle(xp, yp, vertices):
         return False
 
 
-def check_orientation(pos_corrente, pos_precedente, porta: Porta):
+def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
     if porta.color == GREEN:
         match porta.tipo.value:
             case Entrata.ALTO_SX.value:
@@ -131,11 +131,7 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta):
                 return Passato.PASSATO.value
 
 
-def check(track: list[any], array_porte: list[Porta]) -> object:
-    """
-
-    :rtype: object
-    """
+def check(track: list[any], array_porte):
     global segno_os
     track_rev = track.copy()
     track_rev.reverse()
@@ -171,7 +167,12 @@ def check(track: list[any], array_porte: list[Porta]) -> object:
     return None
 
 
-def run_tracker_in_thread(filename, model, file_index):
+def run_tracker_in_thread(filename, file_index):
+    # Instantiate a separate model object within each thread to ensure they do not share state which could
+    # lead to conflicts. This means calling YOLO('yolov8n.pt') inside the run_tracker_in_thread function
+    # for each thread, instead of passing a shared model.
+    model = YOLO(MODEL_FN)
+
     global array_porte
     passed = None
     scr_width, scr_height = get_screen_size()
@@ -314,22 +315,17 @@ def run_tracker_in_thread(filename, model, file_index):
     out.release()
     cap.release()
 
-
-# Load the models
-model1 = YOLO("yolov8x-seg.pt")
-model2 = YOLO("yolov8x-seg.pt")
-
 # Create the tracker threads
-
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, model1, 2), daemon=True)
-tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
-# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 4), daemon=True)
-tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 5), daemon=True)
-tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, model1, 6), daemon=True)
-tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 7), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
+tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
+tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
+tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
+tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
+tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, 6), daemon=True)
 
 # Start the tracker threads
+# tracker_thread1.start()
 timer = time.time()
 #tracker_thread1.start()
 tracker_thread2.start()

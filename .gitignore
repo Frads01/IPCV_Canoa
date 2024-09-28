@@ -168,3 +168,6 @@ cython_debug/
 # *.PNG
 *.pt
 *.PT
+
+# .txt result files
+Risultati/*.txt
