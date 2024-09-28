@@ -216,7 +216,7 @@ def run_tracker_in_thread(filename, model, file_index):
         pass
 
     frame_num = 1
-    frame_count_pass = 1
+    # frame_count_pass = 1
     while cap.isOpened() and frame is not None:
         print(str(f"thread {file_index} : frame {frame_num}"))
         # Read a frame from the video
@@ -274,24 +274,24 @@ def run_tracker_in_thread(filename, model, file_index):
                 # cv2.putText(frame, 'Porta ' + str(passed[1]),
                 #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
                 #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
-                frame_count_pass += 1
+                # frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                if frame_count_pass >= 3:
-                    passed = None
-                    frame_count_pass = 1
+                # if frame_count_pass >= 3:
+                #     passed = None
+                #     frame_count_pass = 1
             elif passed is not None and passed[0] == Passato.PASSATO_MALE.value[0]:
                 # cv2.putText(frame, 'Porta ' + str(passed[1]),
                 #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
                 #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
-                frame_count_pass += 1
+                # frame_count_pass += 1
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                if frame_count_pass >= 3:
-                    passed = None
-                    frame_count_pass = 1
+                # if frame_count_pass >= 3:
+                #     passed = None
+                #     frame_count_pass = 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             # cv2.imshow(out_name, frame)
