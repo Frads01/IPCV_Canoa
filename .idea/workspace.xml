@@ -5,9 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a5e6a70-1a00-42eb-bb8e-bc1024dee222" name="Changes" comment="Aggiustati i box delle porte">
+      <change afterPath="$PROJECT_DIR$/CompareTracciato.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati/2-PonteDestra_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati/3-PonteSinistra_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati/4-BalconeAvanti_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati/5-LungoCanale_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati/6-Arrivo_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/2-PonteDestra_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/3-PonteSinistra_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/4-BalconeAvanti_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/5-LungoCanale_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/6-Arrivo_track.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Risultati_NOroi/porte.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Risultati/porte.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Risultati/porte.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CoordinatePorte_170724.py" beforeDir="false" afterPath="$PROJECT_DIR$/CoordinatePorte_170724.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Risultati/2-PonteDestraShort_track.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Risultati/4a-BalconeDietro_track.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Risultati/porte.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" beforeDir="false" afterPath="$PROJECT_DIR$/TracciamentoOggetto_v3.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +124,9 @@
       <workItem from="1727451560067" duration="308000" />
       <workItem from="1727452059143" duration="27000" />
       <workItem from="1727452098765" duration="1000" />
-      <workItem from="1727452360909" duration="1181000" />
+      <workItem from="1727452360909" duration="3336000" />
+      <workItem from="1727509924356" duration="5544000" />
+      <workItem from="1727518012463" duration="1268000" />
     </task>
     <task id="LOCAL-00001" summary="Aggiunto maschere e porte per il video dalla camera : PonteDestra">
       <option name="closed" value="true" />
@@ -161,7 +178,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto.coverage" NAME="TracciamentoOggetto Coverage Results" MODIFIED="1722430093909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$TakeOnlineVideo.coverage" NAME="TakeOnlineVideo Coverage Results" MODIFIED="1723623651170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727452704307" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727518031260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$RilevamentoPorte.coverage" NAME="RilevamentoPorte Coverage Results" MODIFIED="1723622677944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$RiconoscimentoCanoa.coverage" NAME="RiconoscimentoCanoa Coverage Results" MODIFIED="1722423824530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$CatturaVideoOnline.coverage" NAME="CatturaVideoOnline Coverage Results" MODIFIED="1722344877989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

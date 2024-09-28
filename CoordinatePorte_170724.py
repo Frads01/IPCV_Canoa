@@ -74,7 +74,6 @@ class Porta:
 RED = (0, 0, 255)
 GREEN = (0, 255, 0)
 
-
 PORTE_Inizio: list[Porta] = []
 
 PORTE_PonteDestra: list[Porta] = [

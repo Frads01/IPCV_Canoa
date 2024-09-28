@@ -14,6 +14,7 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
+RESULT_ROOT = 'Risultati_NOroi/'
 OFFSET = 5
 FRAME_PRECEDENTI = 3
 
@@ -91,7 +92,7 @@ def is_point_in_rotated_rectangle(xp, yp, vertices):
         return False
 
 
-def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
+def check_orientation(pos_corrente, pos_precedente, porta: Porta):
     if porta.color == GREEN:
         match porta.tipo.value:
             case Entrata.ALTO_SX.value:
@@ -130,7 +131,11 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta) -> int:
                 return Passato.PASSATO.value
 
 
-def check(track: list[any], array_porte):
+def check(track: list[any], array_porte: list[Porta]) -> object:
+    """
+
+    :rtype: object
+    """
     global segno_os
     track_rev = track.copy()
     track_rev.reverse()
@@ -158,12 +163,12 @@ def check(track: list[any], array_porte):
         vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
         vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
 
-        if (is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_px)):
+        if is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_px):
             for i in range(1, FRAME_PRECEDENTI + 1):
-                if (is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax)):
-                    return (check_orientation(track_rev[0], track_rev[2], porta)[0], porta.numero)
+                if is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax):
+                    return check_orientation(track_rev[0], track_rev[2], porta)[0], porta.numero
 
-    return (Passato.NON_PASSATO.value,0)
+    return None
 
 
 def run_tracker_in_thread(filename, model, file_index):
@@ -176,7 +181,8 @@ def run_tracker_in_thread(filename, model, file_index):
 
     cap = cv2.VideoCapture(VIDEO_ROOT + filename + '.mp4')  # Read the video file
     success, frame = cap.read()
-
+    numero_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    print(MASK_ROOT + filename + '_Mask.png')
     mask = cv2.imread(MASK_ROOT + filename + '_Mask.png', 0)
     _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
     mask = mask // 255
@@ -218,7 +224,7 @@ def run_tracker_in_thread(filename, model, file_index):
     frame_num = 1
     frame_count_pass = 1
     while cap.isOpened() and frame is not None:
-        print(str(f"thread {file_index} : frame {frame_num}"))
+        print(str(f"thread {file_index} : frame {frame_num} of {numero_frame}"))
         # Read a frame from the video
         roi = frame * mask
         if success:
@@ -233,10 +239,10 @@ def run_tracker_in_thread(filename, model, file_index):
             for result in results:
                 if result.boxes.id is not None:
                     # Get the boxes and track IDs
-                    boxes = results[0].boxes.xywh.cpu()
-                    track_ids = results[0].boxes.id.int().cpu().tolist()
+                    boxes = result.boxes.xywh.cpu()
+                    track_ids = result.boxes.id.int().cpu().tolist()
                     # Visualize the results on the frame
-                    annotated_frame = results[0].plot()
+                    annotated_frame = result.plot()
                     # Plot the tracks
                     for box, track_id in zip(boxes, track_ids):
                         x, y, w, h = box
@@ -249,7 +255,7 @@ def run_tracker_in_thread(filename, model, file_index):
                         #    track.pop(0)
 
                         # Checks if the player has passed through a door 
-                        if (len(track) >= FRAME_PRECEDENTI + 1):
+                        if len(track) >= FRAME_PRECEDENTI + 1:
                             passed = check(track, array_porte)
 
                         # Draw the tracking lines
@@ -267,31 +273,27 @@ def run_tracker_in_thread(filename, model, file_index):
             except UnboundLocalError:
                 pass
 
-            cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
-                        cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
+            # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
+            #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
             if passed is not None and passed[0] == Passato.PASSATO.value[0]:
-                # cv2.putText(frame, 'Porta ' + str(passed[1]),
-                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
-                frame_count_pass += 1
-                with porte_passate_lock:
-                    print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
-                    porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                if frame_count_pass >= 3:
-                    passed = None
-                    frame_count_pass = 1
+                cv2.putText(frame, 'Porta ' + str(passed[1]),
+                            (10, frame.shape[0] - (40 * fontsize)),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
+                frame_count_pass = 1
             elif passed is not None and passed[0] == Passato.PASSATO_MALE.value[0]:
-                # cv2.putText(frame, 'Porta ' + str(passed[1]),
-                #             (frame.shape[1] * 3 // 4 + 10, frame.shape[0] - (40 * fontsize)),
-                #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
-                frame_count_pass += 1
+                cv2.putText(frame, 'Porta ' + str(passed[1]),
+                            (10, frame.shape[0] - (40 * fontsize)),
+                            cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
+                frame_count_pass = 1
+
+            if 3 >= frame_count_pass > 0 and passed is not None:
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica array nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
-                if frame_count_pass >= 3:
-                    passed = None
-                    frame_count_pass = 1
+                frame_count_pass += 1
+            else:
+                frame_count_pass = 0
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             # cv2.imshow(out_name, frame)
@@ -314,40 +316,58 @@ def run_tracker_in_thread(filename, model, file_index):
 
 
 # Load the models
-model1 = YOLO("yolov9e-seg.pt")
-model2 = YOLO("yolov9e-seg.pt")
+model1 = YOLO("yolov8x-seg.pt")
+model2 = YOLO("yolov8x-seg.pt")
 
 # Create the tracker threads
 
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, model1, 2), daemon=True)
-# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, model1, 2), daemon=True)
+tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, model1, 3), daemon=True)
 # tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, model1, 4), daemon=True)
-# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 4), daemon=True)
-# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, model1, 5), daemon=True)
-# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 6), daemon=True)
+tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, model1, 5), daemon=True)
+tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, model1, 6), daemon=True)
+tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, model1, 7), daemon=True)
 
 # Start the tracker threads
+timer = time.time()
 #tracker_thread1.start()
 tracker_thread2.start()
 timer2 = time.time()
-# tracker_thread3.start()
+tracker_thread3.start()
+timer3 = time.time()
 # tracker_thread4.start()
-# tracker_thread5.start()
-# tracker_thread6.start()
-# tracker_thread7.start()
+# timer4 = time.time()
+tracker_thread5.start()
+timer5 = time.time()
+tracker_thread6.start()
+timer6 = time.time()
+tracker_thread7.start()
+timer7 = time.time()
 
 # Wait for the tracker threads to finish
-#racker_thread1.join()
-
+# tracker_thread1.join()
 tracker_thread2.join()
 timer2 = time.time() - timer2
-print(f"il thread 1 ci ha messo {timer2 // 60} minuti e {timer2 % 60} secondi")
-# tracker_thread3.join()
+print(f"il thread 2 ci ha messo {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
+tracker_thread3.join()
+timer3 = time.time() - timer3
+print(f"il thread 3 ci ha messo {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
 # tracker_thread4.join()
-# tracker_thread5.join()
-# tracker_thread6.join()
-# tracker_thread7.join()
+# timer4 = time.time() - timer4
+# print(f"il thread 4 ci ha messo {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
+tracker_thread5.join()
+timer5 = time.time() - timer5
+print(f"il thread 5 ci ha messo {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
+tracker_thread6.join()
+timer6 = time.time() - timer6
+print(f"il thread 6 ci ha messo {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
+tracker_thread7.join()
+timer7 = time.time() - timer7
+print(f"il thread 7 ci ha messo {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
+
+timer = time.time() - timer
+print(f"l'esecuzione ha impiegato {timer // 60} minuti e {int(timer % 60)} secondi")
 
 porte_file_path = str(RESULT_ROOT + 'porte.txt')
 
@@ -364,10 +384,10 @@ for porta in porte_passate:
         file_porte.write(str(f"{porta[0]},\t{porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
     elif porta[1] == Passato.PASSATO.value[0]:
         print(f"nella porta {porta[0]} l'atleta è Passato correttamente")
-        file_porte.write(str(f"{porta[0]}, {porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
+        file_porte.write(str(f"{porta[0]},\t{porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
     else:
         print(f"nella porta {porta[0]} l'atleta non è Passato")
-        file_porte.write(str(f"{porta[0]}, {porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
+        file_porte.write(str(f"{porta[0]},\t{porta[1]},\t{porta[2][0]},\t{porta[2][1]}\n"))
 
 # Clean up and close windows
 file_porte.close()
