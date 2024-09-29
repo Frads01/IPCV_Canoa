@@ -4,6 +4,9 @@ import threading
 import time
 from collections import defaultdict
 import tkinter as tk
+
+import torch
+
 from CoordinatePorte_170724 import *
 # from CoordinatePorte_040924 import *
 import types
@@ -14,6 +17,7 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
+# RESULT_ROOT = 'Risultati_NOroi/'
 OFFSET = 5
 FRAME_PRECEDENTI = 3
 MODEL_FN = 'yolov9e-seg.pt'
@@ -172,6 +176,11 @@ def run_tracker_in_thread(filename, file_index):
     # lead to conflicts. This means calling YOLO('yolov8n.pt') inside the run_tracker_in_thread function
     # for each thread, instead of passing a shared model.
     model = YOLO(MODEL_FN)
+    print(torch.cuda.device_count())
+
+    if torch.cuda.is_available():
+        print("CUDA is available")
+        model.to('cuda')
 
     passed = None
     scr_width, scr_height = get_screen_size()

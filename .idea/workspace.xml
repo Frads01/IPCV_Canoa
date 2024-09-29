@@ -115,7 +115,7 @@
       <workItem from="1727452098765" duration="1000" />
       <workItem from="1727452360909" duration="3336000" />
       <workItem from="1727509924356" duration="5544000" />
-      <workItem from="1727518012463" duration="4654000" />
+      <workItem from="1727518012463" duration="6001000" />
     </task>
     <task id="LOCAL-00001" summary="Aggiunto maschere e porte per il video dalla camera : PonteDestra">
       <option name="closed" value="true" />
@@ -155,6 +155,13 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/TracciamentoOggetto_v3.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -167,7 +174,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CanoaSlalom$TracciamentoOggetto.coverage" NAME="TracciamentoOggetto Coverage Results" MODIFIED="1722430093909" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$TakeOnlineVideo.coverage" NAME="TakeOnlineVideo Coverage Results" MODIFIED="1723623651170" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727524294004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/IPCV_Canoa$TracciamentoOggetto_v3.coverage" NAME="TracciamentoOggetto_v3 Coverage Results" MODIFIED="1727620585841" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$RilevamentoPorte.coverage" NAME="RilevamentoPorte Coverage Results" MODIFIED="1723622677944" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$RiconoscimentoCanoa.coverage" NAME="RiconoscimentoCanoa Coverage Results" MODIFIED="1722423824530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CanoaSlalom$CatturaVideoOnline.coverage" NAME="CatturaVideoOnline Coverage Results" MODIFIED="1722344877989" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
