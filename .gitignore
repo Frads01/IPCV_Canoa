@@ -169,7 +169,27 @@ cython_debug/
 *.pt
 *.PT
 
-# Result files
-Risultati/
-RisultatiGPU/
-Risultati_NOroi/
+Risultati/1-Inizio_track.txt
+Risultati/2-PonteDestra_track.txt
+Risultati/3-PonteSinistra_track.txt
+Risultati/4-BalconeAvanti_track.txt
+Risultati/4a-BalconeDietro_track.txt
+Risultati/5-LungoCanale_track.txt
+Risultati/6-Arrivo_track.txt
+
+RisultatiGUI/1-Inizio_track.txt
+RisultatiGUI/2-PonteDestra_track.txt
+RisultatiGUI/3-PonteSinistra_track.txt
+RisultatiGUI/4-BalconeAvanti_track.txt
+RisultatiGUI/4a-BalconeDietro_track.txt
+RisultatiGUI/5-LungoCanale_track.txt
+RisultatiGUI/6-Arrivo_track.txt
+
+Risultat_NOroi/1-Inizio_track.txt
+Risultat_NOroi/2-PonteDestra_track.txt
+Risultat_NOroi/3-PonteSinistra_track.txt
+Risultat_NOroi/4-BalconeAvanti_track.txt
+Risultat_NOroi/4a-BalconeDietro_track.txt
+Risultat_NOroi/5-LungoCanale_track.txt
+Risultat_NOroi/6-Arrivo_track.txt
+

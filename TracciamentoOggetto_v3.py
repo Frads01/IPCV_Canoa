@@ -176,10 +176,9 @@ def run_tracker_in_thread(filename, file_index):
     # lead to conflicts. This means calling YOLO('yolov8n.pt') inside the run_tracker_in_thread function
     # for each thread, instead of passing a shared model.
     model = YOLO(MODEL_FN)
-    print(torch.cuda.device_count())
 
     if torch.cuda.is_available():
-        print("CUDA is available")
+        print("CUDA device found. Using GPU for inference.")
         model.to('cuda')
 
     passed = None
@@ -275,14 +274,14 @@ def run_tracker_in_thread(filename, file_index):
 
             fontsize = 2
 
-            # try:
-            #     for porta in array_porte:
-            #         frame = porta.draw(frame)
-            # except UnboundLocalError:
-            #     pass
+            try:
+                for porta in array_porte:
+                    frame = porta.draw(frame)
+            except UnboundLocalError:
+                pass
 
-            # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
-            #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
+            cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
+                        cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
             if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
                 frame_count_pass = 1
@@ -326,21 +325,22 @@ def run_tracker_in_thread(filename, file_index):
 
 # Create the tracker threads
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, 2), daemon=True)
-tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
-tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
+# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestra, 2), daemon=True)
+# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
+# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
 tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
 tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
 tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, 6), daemon=True)
 
 # Start the tracker threads
-# tracker_thread1.start()
 timer = time.time()
+# tracker_thread1.start()
+# timer1 = time.time()
 #tracker_thread1.start()
-tracker_thread2.start()
-timer2 = time.time()
-tracker_thread3.start()
-timer3 = time.time()
+# tracker_thread2.start()
+# timer2 = time.time()
+# tracker_thread3.start()
+# timer3 = time.time()
 # tracker_thread4.start()
 # timer4 = time.time()
 tracker_thread5.start()
@@ -352,24 +352,26 @@ timer7 = time.time()
 
 # Wait for the tracker threads to finish
 # tracker_thread1.join()
-tracker_thread2.join()
-timer2 = time.time() - timer2
-print(f"il thread 2 ci ha messo {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
-tracker_thread3.join()
-timer3 = time.time() - timer3
-print(f"il thread 3 ci ha messo {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
+# timer1 = time.time() - timer2
+# print(f"il thread 1 ha impiegato {timer1 // 60} minuti e {int(timer1 % 60)} secondi")
+# tracker_thread2.join()
+# timer2 = time.time() - timer2
+# print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
+# tracker_thread3.join()
+# timer3 = time.time() - timer3
+# print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
 # tracker_thread4.join()
 # timer4 = time.time() - timer4
-# print(f"il thread 4 ci ha messo {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
+# print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
 tracker_thread5.join()
 timer5 = time.time() - timer5
-print(f"il thread 5 ci ha messo {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
+print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
 tracker_thread6.join()
 timer6 = time.time() - timer6
-print(f"il thread 6 ci ha messo {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
+print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
 tracker_thread7.join()
 timer7 = time.time() - timer7
-print(f"il thread 7 ci ha messo {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
+print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
 
 timer = time.time() - timer
 print(f"l'esecuzione ha impiegato {timer // 60} minuti e {int(timer % 60)} secondi")
