@@ -10,7 +10,7 @@ import types
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
-RESULT_ROOT = 'Risultati_NOroi/'
+# RESULT_ROOT = 'Risultati_NOroi/'
 
 file_nella_cartella = [f for f in os.listdir(RESULT_ROOT) if f.endswith('.txt')
                        and os.path.isfile(os.path.join(RESULT_ROOT, f))]
