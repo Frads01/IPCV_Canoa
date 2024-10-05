@@ -4,7 +4,7 @@ import threading
 import time
 from collections import defaultdict
 import tkinter as tk
-
+from shapely.geometry import Point, Polygon
 import torch
 
 from CoordinatePorte_170724 import *
@@ -17,8 +17,8 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
-RESULT_ROOT = 'Risultati_NOroi/'
-OFFSET = 5
+# RESULT_ROOT = 'Risultati_NOroi/'
+OFFSET = 30
 FRAME_PRECEDENTI = 3
 MODEL_FN = 'yolov9e-seg.pt'
 
@@ -51,46 +51,23 @@ def get_screen_size():
     return width, height
 
 
-def is_point_in_rotated_rectangle(xp, yp, vertices):
+def is_inside(xp, yp, vertices):
     x1, y1 = vertices[0]
     x2, y2 = vertices[1]
     x3, y3 = vertices[2]
     x4, y4 = vertices[3]
 
-    # Calcola il centro del rettangolo (media delle coordinate dei vertici)
-    xc = (x1 + x2 + x3 + x4) / 4
-    yc = (y1 + y2 + y3 + y4) / 4
+    # Definisci i vertici del poligono (quadrilatero)
+    vertici_poligono = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
 
-    # Trova l'angolo di rotazione usando il lato tra (x1, y1) e (x2, y2)
-    dx = x2 - x1
-    dy = y2 - y1
-    angle = math.atan2(dy, dx)  # Angolo di rotazione del rettangolo rispetto agli assi
+    # Crea il poligono con i vertici
+    poligono = Polygon(vertici_poligono)
 
-    # Funzione per ruotare un punto attorno a un centro
-    def rotate_point(x, y, xc, yc, angle):
-        # Trasla il punto in modo che il centro sia l'origine
-        x_translated = x - xc
-        y_translated = y - yc
+    # Definisci il punto da controllare
+    punto = Point(xp, yp)
 
-        # Applica la rotazione inversa
-        x_rotated = x_translated * math.cos(-angle) - y_translated * math.sin(-angle)
-        y_rotated = x_translated * math.sin(-angle) + y_translated * math.cos(-angle)
-
-        return x_rotated, y_rotated
-
-    # Ruota il punto (xp, yp) attorno al centro del rettangolo
-    x_rot, y_rot = rotate_point(xp, yp, xc, yc, angle)
-
-    # Ruota anche i vertici del rettangolo
-    x1_rot, y1_rot = rotate_point(x1, y1, xc, yc, angle)
-    x2_rot, y2_rot = rotate_point(x2, y2, xc, yc, angle)
-
-    # Determina i limiti del rettangolo ruotato
-    width = math.dist((x1_rot, y1_rot), (x2_rot, y2_rot))  # Distanza tra (x1, y1) e (x2, y2)
-    height = math.dist((x1_rot, y1_rot), (x4, y4))  # Distanza tra (x1, y1) e (x4, y4)
-
-    # Verifica se il punto ruotato si trova all'interno del rettangolo allineato
-    if -width / 2 <= x_rot <= width / 2 and -height / 2 <= y_rot <= height / 2:
+    # Controlla se il punto si trova all'interno del poligono
+    if poligono.contains(punto):
         return True
     else:
         return False
@@ -136,7 +113,7 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta):
 
 
 def check(track: list[any], array_porte):
-    global segno_os
+    # global segno_os
     track_rev = track.copy()
     track_rev.reverse()
     for porta in array_porte:
@@ -155,17 +132,17 @@ def check(track: list[any], array_porte):
             segno_os = [1, 1, -1, -1]
 
         vertici_full = [
-            (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-            (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
+            (porta.x3, porta.y3 + segno_os[1] * OFFSET),
+            (porta.x4, porta.y4 + segno_os[1] * OFFSET),
             (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
             (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
         ]
         vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
         vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
 
-        if is_point_in_rotated_rectangle(track_rev[0][0], track_rev[0][1], vertici_px):
+        if is_inside(track_rev[0][0], track_rev[0][1], vertici_px):
             for i in range(1, FRAME_PRECEDENTI + 1):
-                if is_point_in_rotated_rectangle(track_rev[i][0], track_rev[i][1], vertici_ax):
+                if is_inside(track_rev[i][0], track_rev[i][1], vertici_ax):
                     return check_orientation(track_rev[0], track_rev[2], porta)[0], porta.numero
 
     return None
@@ -231,6 +208,7 @@ def run_tracker_in_thread(filename, file_index):
 
     frame_num = 1
     frame_count_pass = 1
+    pass_print = (0,0)
     while cap.isOpened() and frame is not None:
         print(str(f"thread {file_index} : frame {frame_num} of {numero_frame}"))
         # Read a frame from the video
@@ -284,29 +262,55 @@ def run_tracker_in_thread(filename, file_index):
             # except UnboundLocalError:
             #     pass
 
+            for porta in array_porte:
+                if porta.tipo.value == Entrata.ALTO_SX.value:
+                    segno_os = [-1, -1, 1, 1]
+                elif porta.tipo.value == Entrata.ALTO_DX.value:
+                    segno_os = [1, -1, -1, 1]
+                elif porta.tipo.value == Entrata.BASSO_SX.value:
+                    segno_os = [-1, 1, 1, -1]
+                elif porta.tipo.value == Entrata.BASSO_DX.value:
+                    segno_os = [1, 1, -1, -1]
+
+                vertici_full = [
+                    (porta.x3, porta.y3 + segno_os[1] * OFFSET),
+                    (porta.x4, porta.y4 + segno_os[1] * OFFSET),
+                    (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
+                    (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
+                ]
+                vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
+                vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
+
+                pts = np.array([vertici_ax], np.int32)
+                pts = pts.reshape((-1, 1, 2))
+
+                cv2.polylines(frame, [pts], isClosed=True, color=(255, 255 ,0), thickness=3, lineType=cv2.LINE_8)
+
+                pts = np.array([vertici_px], np.int32)
+                pts = pts.reshape((-1, 1, 2))
+
+                cv2.polylines(frame, [pts], isClosed=True, color=(255, 255 ,0), thickness=3, lineType=cv2.LINE_8)
+
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
 
             if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
                 frame_count_pass = 1
-
-            if 6 >= frame_count_pass > 0 and passed is not None:
-                if passed[0] == Passato.PASSATO.value[0]:
-                    cv2.putText(frame, 'Passata ' + str(passed[1]),
-                                (10, frame.shape[0] - (40 * fontsize)),
-                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
-                    frame_count_pass = 1
-                elif passed[0] == Passato.PASSATO_MALE.value[0]:
-                    cv2.putText(frame, 'Passata Male ' + str(passed[1]),
-                                (10, frame.shape[0] - (40 * fontsize)),
-                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
-                    frame_count_pass = 1
+                pass_print = passed
                 with porte_passate_lock:
                     print(f"Thread {file_index}: Modifica arrayPorte nella posizione {passed[1]} con risultato {passed[0]}")
                     porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
+
+            if 6 >= frame_count_pass > 0:
+                if pass_print[0] == Passato.PASSATO.value[0]:
+                    cv2.putText(frame, 'Passata ' + str(pass_print[1]),
+                                (10, frame.shape[0] - (40 * fontsize)),
+                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 255, 0), 3, cv2.LINE_AA)
+                elif pass_print[0] == Passato.PASSATO_MALE.value[0]:
+                    cv2.putText(frame, 'Passata Male ' + str(pass_print[1]),
+                                (10, frame.shape[0] - (40 * fontsize)),
+                                cv2.FONT_HERSHEY_SIMPLEX, fontsize, (0, 0, 255), 3, cv2.LINE_AA)
                 frame_count_pass += 1
-            else:
-                frame_count_pass = 0
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             # cv2.imshow(out_name, frame)
