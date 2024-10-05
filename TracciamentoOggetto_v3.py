@@ -17,7 +17,7 @@ import numpy as np
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
-# RESULT_ROOT = 'Risultati_NOroi/'
+RESULT_ROOT = 'Risultati_NOroi/'
 OFFSET = 5
 FRAME_PRECEDENTI = 3
 MODEL_FN = 'yolov9e-seg.pt'
@@ -178,8 +178,9 @@ def run_tracker_in_thread(filename, file_index):
     model = YOLO(MODEL_FN)
 
     if torch.cuda.is_available():
-        print("CUDA device found. Using GPU for inference.")
         model.to('cuda')
+    else:
+        print("CUDA device NOT found. Using CPU for inference.")
 
     passed = None
     scr_width, scr_height = get_screen_size()
@@ -233,7 +234,10 @@ def run_tracker_in_thread(filename, file_index):
     while cap.isOpened() and frame is not None:
         print(str(f"thread {file_index} : frame {frame_num} of {numero_frame}"))
         # Read a frame from the video
-        roi = frame * mask
+        if RESULT_ROOT == 'Risultati/':
+            roi = frame * mask
+        else:
+            roi = frame
         if success:
             # Run YOLOv9 tracking on the frame, persisting tracks between frames
             conf = 0.1
