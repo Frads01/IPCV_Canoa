@@ -52,25 +52,14 @@ def get_screen_size():
 
 
 def is_inside(xp, yp, vertices):
-    x1, y1 = vertices[0]
-    x2, y2 = vertices[1]
-    x3, y3 = vertices[2]
-    x4, y4 = vertices[3]
-
-    # Definisci i vertici del poligono (quadrilatero)
-    vertici_poligono = [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
-
-    # Crea il poligono con i vertici
-    poligono = Polygon(vertici_poligono)
+    # Crea il poligono usando i vertici
+    poligono = Polygon(vertices)
 
     # Definisci il punto da controllare
     punto = Point(xp, yp)
 
-    # Controlla se il punto si trova all'interno del poligono
-    if poligono.contains(punto):
-        return True
-    else:
-        return False
+    # Restituisci True se il punto è all'interno o sul bordo del poligono
+    return poligono.intersects(punto)
 
 
 def check_orientation(pos_corrente, pos_precedente, porta: Porta):
@@ -112,7 +101,7 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta):
                 return Passato.PASSATO.value
 
 
-def check(track: list[any], array_porte):
+def check(track: list[any], array_porte, frame):
     # global segno_os
     track_rev = track.copy()
     track_rev.reverse()
@@ -121,11 +110,9 @@ def check(track: list[any], array_porte):
             continue
 
         # (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
-        
-        m = (porta.y3 - porta.y4) / (porta.x3 - porta.x4)
 
         if porta.tipo.value == Entrata.ALTO_SX.value:
-            segno_os = [0, -1, 1, 1]
+            segno_os = [0, -1, 4, 0]
         elif porta.tipo.value == Entrata.ALTO_DX.value:
             segno_os = [1, -1, -1, 1]
         elif porta.tipo.value == Entrata.BASSO_SX.value:
@@ -139,10 +126,9 @@ def check(track: list[any], array_porte):
             (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
             (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
         ]
-        vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
         dx = porta.x4 - porta.x3
         dy = porta.y4 - porta.y3
-        d = math.sqrt(dx**2 + dy**2)
+        d = math.sqrt(dx ** 2 + dy ** 2)
 
         # Normalizzazione del vettore direttore
         u_x = dx / d
@@ -153,6 +139,7 @@ def check(track: list[any], array_porte):
         y3 = porta.y3 + OFFSET * u_y
         x4 = porta.x4 + OFFSET * u_x
         y4 = porta.y4 + OFFSET * u_y
+        vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (x4, porta.y4)]
         vertici_px = [(x3, y3), (x4, y4), vertici_full[2], vertici_full[3]]
 
         if is_inside(track_rev[0][0], track_rev[0][1], vertici_px):
@@ -260,7 +247,7 @@ def run_tracker_in_thread(filename, file_index):
 
                         # Checks if the player has passed through a door 
                         if len(track) >= FRAME_PRECEDENTI + 1:
-                            passed = check(track, array_porte)
+                            passed = check(track, array_porte,frame_num)
 
                         # Draw the tracking lines
                         points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
@@ -279,26 +266,23 @@ def run_tracker_in_thread(filename, file_index):
 
             for porta in array_porte:
                 if porta.tipo.value == Entrata.ALTO_SX.value:
-                    segno_os = [0, -1, 1, 1]
+                    segno_os = [0, -1, 4, 0]
                 elif porta.tipo.value == Entrata.ALTO_DX.value:
                     segno_os = [1, -1, -1, 1]
                 elif porta.tipo.value == Entrata.BASSO_SX.value:
                     segno_os = [-1, 1, 1, -1]
                 elif porta.tipo.value == Entrata.BASSO_DX.value:
                     segno_os = [1, 1, -1, -1]
-                    
-                m = -(porta.y4 - porta.y3) / (porta.x4 - porta.x3)
 
                 vertici_full = [
-                    (porta.x3, porta.y3 + segno_os[1] * OFFSET),
-                    (porta.x4, porta.y4 + segno_os[1] * OFFSET),
+                    (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
+                    (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
                     (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
                     (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
                 ]
-                vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
                 dx = porta.x4 - porta.x3
                 dy = porta.y4 - porta.y3
-                d = math.sqrt(dx**2 + dy**2)
+                d = math.sqrt(dx ** 2 + dy ** 2)
 
                 # Normalizzazione del vettore direttore
                 u_x = dx / d
@@ -309,7 +293,7 @@ def run_tracker_in_thread(filename, file_index):
                 y3 = porta.y3 + OFFSET * u_y
                 x4 = porta.x4 + OFFSET * u_x
                 y4 = porta.y4 + OFFSET * u_y
-
+                vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (x4, y4)]
                 vertici_px = [(x3, y3), (x4, y4), vertici_full[2], vertici_full[3]]
 
                 pts = np.array([vertici_ax], np.int32)
@@ -344,7 +328,7 @@ def run_tracker_in_thread(filename, file_index):
                 frame_count_pass += 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-            # cv2.imshow(out_name, frame)
+            cv2.imshow(out_name, frame)
             # Write the frame to the output file
             out.write(frame)
             frame_num += 1
