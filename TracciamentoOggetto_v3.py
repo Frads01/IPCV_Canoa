@@ -18,7 +18,7 @@ VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 # RESULT_ROOT = 'Risultati_NOroi/'
-OFFSET = 15
+OFFSET = 25
 FRAME_PRECEDENTI = 5
 MODEL_FN = 'yolov9e-seg.pt'
 
@@ -110,15 +110,21 @@ def check(track: list[any], array_porte, frame):
             continue
 
         # (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
+        # segno_os = [
+            # offsetx_alto,
+            # offsety_alto,
+            # offsetx_basso,
+            # offsety_basso
+        # ]
 
         if porta.tipo.value == Entrata.ALTO_SX.value:
-            segno_os = [0, -1, 4, 0]
+            segno_os = [0, -1, 4, 1]
         elif porta.tipo.value == Entrata.ALTO_DX.value:
-            segno_os = [1, -1, -1, 1]
+            segno_os = [0, -1, -4, 1]
         elif porta.tipo.value == Entrata.BASSO_SX.value:
-            segno_os = [-1, 1, 1, -1]
+            segno_os = [0, -1, 4, -1]
         elif porta.tipo.value == Entrata.BASSO_DX.value:
-            segno_os = [1, 1, -1, -1]
+            segno_os = [0, -1, 4, -1]
 
         vertici_full = [
             (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
@@ -135,10 +141,10 @@ def check(track: list[any], array_porte, frame):
         u_y = dy / d
 
         # Calcolo delle nuove coordinate dei punti
-        x3 = porta.x3 + OFFSET * u_x
-        y3 = porta.y3 + OFFSET * u_y
-        x4 = porta.x4 + OFFSET * u_x
-        y4 = porta.y4 + OFFSET * u_y
+        x3 = int(porta.x3 + OFFSET * u_x)
+        y3 = int(porta.y3 + OFFSET * u_y)
+        x4 = int(porta.x4 + OFFSET * u_x)
+        y4 = int(porta.y4 + OFFSET * u_y)
         vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (x4, porta.y4)]
         vertici_px = [(x3, y3), (x4, y4), vertici_full[2], vertici_full[3]]
 
@@ -251,7 +257,7 @@ def run_tracker_in_thread(filename, file_index):
 
                         # Draw the tracking lines
                         points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
-                        cv2.polylines(annotated_frame, [points], isClosed=False, color=(255, 0, 0, 1), thickness=5,
+                        cv2.polylines(annotated_frame, [points], isClosed=False, color=(255, 255, 255), thickness=1,
                                       lineType=cv2.LINE_AA)
                     maschera = annotated_frame > 1
                     frame[maschera] = annotated_frame[maschera]
@@ -299,12 +305,12 @@ def run_tracker_in_thread(filename, file_index):
                 pts = np.array([vertici_ax], np.int32)
                 pts = pts.reshape((-1, 1, 2))
 
-                cv2.polylines(frame, [pts], isClosed=True, color=(255, 255 ,0), thickness=3, lineType=cv2.LINE_8)
+                cv2.polylines(frame, [pts], isClosed=True, color=(255, 255 ,0), thickness=1, lineType=cv2.LINE_8)
 
                 pts = np.array([vertici_px], np.int32)
                 pts = pts.reshape((-1, 1, 2))
 
-                cv2.polylines(frame, [pts], isClosed=True, color=(0, 255 ,255), thickness=3, lineType=cv2.LINE_8)
+                cv2.polylines(frame, [pts], isClosed=True, color=(0, 255 ,255), thickness=1, lineType=cv2.LINE_8)
 
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
