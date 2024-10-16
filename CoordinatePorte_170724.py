@@ -82,7 +82,7 @@ PORTE_PonteDestra: list[Porta] = [
     Porta(x1=1219, y1=496, x2=1321, y2=457, x3=1209, y3=676, x4=1316, y4=647, color=GREEN, numero=28, tipo=Entrata.ALTO_SX),
     Porta(x1=658, y1=444, x2=805, y2=444, x3=664, y3=628, x4=805, y4=614, color=RED, numero=27, tipo=Entrata.ALTO_SX),
     Porta(x1=610, y1=451, x2=720, y2=442, x3=614, y3=592, x4=723, y4=581, color=GREEN, numero=26, tipo=Entrata.ALTO_SX),
-    Porta(x1=1015, y1=432, x2=1090, y2=398, x3=1015, y3=577, x4=1090, y4=517, color=GREEN, numero=25, tipo=Entrata.ALTO_SX),
+    Porta(x1=1015, y1=432, x2=1090, y2=398, x3=1015, y3=520, x4=1090, y4=517, color=GREEN, numero=25, tipo=Entrata.ALTO_SX),
     Porta(x1=474, y1=417, x2=576, y2=423, x3=474, y3=543, x4=576, y4=547, color=RED, numero=24, tipo=Entrata.ALTO_SX)
 ]
 

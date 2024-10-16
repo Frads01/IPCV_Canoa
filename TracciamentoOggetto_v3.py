@@ -379,8 +379,8 @@ def run_tracker_in_thread(filename, file_index):
 
 # Create the tracker threads
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
-# tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
-tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
+tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
+# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
 # tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
 # tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
 # tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
@@ -390,10 +390,10 @@ tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteS
 timer = time.time()
 # tracker_thread1.start()
 # timer1 = time.time()
-# tracker_thread2.start()
-# timer2 = time.time()
-tracker_thread3.start()
-timer3 = time.time()
+tracker_thread2.start()
+timer2 = time.time()
+# tracker_thread3.start()
+# timer3 = time.time()
 # tracker_thread4.start()
 # timer4 = time.time()
 # tracker_thread5.start()
@@ -407,12 +407,12 @@ timer3 = time.time()
 # tracker_thread1.join()
 # timer1 = time.time() - timer1
 # print(f"il thread 1 ha impiegato {timer1 // 60} minuti e {int(timer1 % 60)} secondi")
-# tracker_thread2.join()
-# timer2 = time.time() - timer2
-# print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
-tracker_thread3.join()
-timer3 = time.time() - timer3
-print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
+tracker_thread2.join()
+timer2 = time.time() - timer2
+print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
+# tracker_thread3.join()
+# timer3 = time.time() - timer3
+# print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
 # tracker_thread4.join()
 # timer4 = time.time() - timer4
 # print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
