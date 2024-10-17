@@ -103,6 +103,60 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta):
                 return Passato.PASSATO.value
 
 
+def define_check_rects(porta):
+    if porta.tipo.value == Entrata.ALTO_SX.value:
+        segno_os = [0, -1, 4, 1]
+    elif porta.tipo.value == Entrata.ALTO_DX.value:
+        segno_os = [0, -1, -4, 1]
+    elif porta.tipo.value == Entrata.BASSO_SX.value:
+        segno_os = [-3, 1, 0, -1]
+    elif porta.tipo.value == Entrata.BASSO_DX.value:
+        segno_os = [3, 1, 0, -1]
+
+    vertici_full = [
+                    (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
+                    (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
+                    (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
+                    (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
+                ]
+    dx = porta.x4 - porta.x3
+    dy = porta.y4 - porta.y3
+    d = math.sqrt(dx ** 2 + dy ** 2)
+
+                # Normalizzazione del vettore direttore
+    u_x = dx / d
+    u_y = dy / d
+                
+    x3 = (porta.x3 + OFFSET * u_x
+            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+            else porta.x3 - OFFSET * u_x)
+    y3 = (porta.y3 + OFFSET * u_y
+            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+            else porta.y3 - OFFSET * u_y)
+    x4 = (porta.x4 + OFFSET * u_x
+            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+            else porta.x4 - OFFSET * u_x)
+    y4 = (porta.y4 + OFFSET * u_y
+            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+            else porta.y4 - OFFSET * u_y)
+
+    if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
+        vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
+                    
+        vertici_px = [(x3, y3), (x4, y4),
+                        (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
+                        (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
+                    
+    elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
+        vertici_ax = [
+                        (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
+                        (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
+                        (x3, y3), (x4, y4)]
+                    
+        vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
+    return vertici_ax, vertici_px
+
+
 def check(track: list[any], array_porte, frame):
     # global segno_os
     track_rev = track.copy()
@@ -119,56 +173,7 @@ def check(track: list[any], array_porte, frame):
             # offsety_basso
         # ]
 
-        if porta.tipo.value == Entrata.ALTO_SX.value:
-            segno_os = [0, -1, 4, 1]
-        elif porta.tipo.value == Entrata.ALTO_DX.value:
-            segno_os = [0, -1, -4, 1]
-        elif porta.tipo.value == Entrata.BASSO_SX.value:
-            segno_os = [-3, 1, 0, -1]
-        elif porta.tipo.value == Entrata.BASSO_DX.value:
-            segno_os = [3, 1, 0, -1]
-
-        vertici_full = [
-            (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-            (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
-            (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
-            (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
-        ]
-        dx = porta.x4 - porta.x3
-        dy = porta.y4 - porta.y3
-        d = math.sqrt(dx ** 2 + dy ** 2)
-
-        # Normalizzazione del vettore direttore
-        u_x = dx / d
-        u_y = dy / d
-        
-        x3 = (porta.x3 + OFFSET * u_x
-                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                else porta.x3 - OFFSET * u_x)
-        y3 = (porta.y3 + OFFSET * u_y
-                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                else porta.y3 - OFFSET * u_y)
-        x4 = (porta.x4 + OFFSET * u_x
-                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                else porta.x4 - OFFSET * u_x)
-        y4 = (porta.y4 + OFFSET * u_y
-                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                else porta.y4 - OFFSET * u_y)
-
-        if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
-            vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
-            
-            vertici_px = [(x3, y3), (x4, y4),
-                (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
-                (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
-            
-        elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
-            vertici_ax = [
-                (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
-                (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
-                (x3, y3), (x4, y4)]
-            
-            vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
+        vertici_ax, vertici_px = define_check_rects(porta)
 
         if is_inside(track_rev[0][0], track_rev[0][1], vertici_px):
             for i in range(1, FRAME_PRECEDENTI + 1):
@@ -292,65 +297,16 @@ def run_tracker_in_thread(filename, file_index):
             # except UnboundLocalError:
             #     pass
 
-            for porta in array_porte:
-                if porta.tipo.value == Entrata.ALTO_SX.value:
-                    segno_os = [0, -1, 4, 1]
-                elif porta.tipo.value == Entrata.ALTO_DX.value:
-                    segno_os = [0, -1, -4, 1]
-                elif porta.tipo.value == Entrata.BASSO_SX.value:
-                    segno_os = [-3, 1, 0, -1]
-                elif porta.tipo.value == Entrata.BASSO_DX.value:
-                    segno_os = [3, 1, 0, -1]
+            # for porta in array_porte:
+            #     vertici_ax, vertici_px = define_check_rects(porta)
 
-                vertici_full = [
-                    (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-                    (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
-                    (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
-                    (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
-                ]
-                dx = porta.x4 - porta.x3
-                dy = porta.y4 - porta.y3
-                d = math.sqrt(dx ** 2 + dy ** 2)
+            #     pts = np.array([vertici_ax], np.int32)
+            #     pts = pts.reshape((-1, 1, 2))
+            #     cv2.polylines(frame, [pts], isClosed=True, color=(0,0,200), thickness=1, lineType=cv2.LINE_8)
 
-                # Normalizzazione del vettore direttore
-                u_x = dx / d
-                u_y = dy / d
-                
-                x3 = (porta.x3 + OFFSET * u_x
-                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                      else porta.x3 - OFFSET * u_x)
-                y3 = (porta.y3 + OFFSET * u_y
-                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                      else porta.y3 - OFFSET * u_y)
-                x4 = (porta.x4 + OFFSET * u_x
-                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                      else porta.x4 - OFFSET * u_x)
-                y4 = (porta.y4 + OFFSET * u_y
-                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-                      else porta.y4 - OFFSET * u_y)
-
-                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
-                    vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
-                    
-                    vertici_px = [(x3, y3), (x4, y4),
-                        (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
-                        (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
-                    
-                elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
-                    vertici_ax = [
-                        (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
-                        (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
-                        (x3, y3), (x4, y4)]
-                    
-                    vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
-
-                pts = np.array([vertici_ax], np.int32)
-                pts = pts.reshape((-1, 1, 2))
-                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,200), thickness=1, lineType=cv2.LINE_8)
-
-                pts = np.array([vertici_px], np.int32)
-                pts = pts.reshape((-1, 1, 2))
-                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,0), thickness=1, lineType=cv2.LINE_8)
+            #     pts = np.array([vertici_px], np.int32)
+            #     pts = pts.reshape((-1, 1, 2))
+            #     cv2.polylines(frame, [pts], isClosed=True, color=(0,0,0), thickness=1, lineType=cv2.LINE_8)
 
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
@@ -391,6 +347,7 @@ def run_tracker_in_thread(filename, file_index):
     file_track.close()
     out.release()
     cap.release()
+
 
 # Create the tracker threads
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
