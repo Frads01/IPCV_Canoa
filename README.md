@@ -1,35 +1,19 @@
-https://www.ivreacanoaclub.info/stadio-della-canoa/webcam/ <br>
+# Progetto Image Processing and Computer Vision - Canoa Slalom
 
-## [LINK REGISTRAZIONI](https://cdn.top-ix.org/ivreacanoa/)
+|       **Corso**       	|          Image Processing and Computer Vision (01TUJ)         	|
+|:----------------------	|:--------------------------------------------------------------	|
+|  **Docente titolare** 	|                  Prof. Montrucchio Bartolomeo                 	|
+| **Membri del gruppo** 	|  Di Santo Francesco<br>Giugliano Salvatore<br>Rosace Giovanna 	|
+|    **Coordinatori**   	|         Dott. Ulrich Luca<br>Dott.ssa Marullo Giorgia	         |
+| **Gruppo di ricerca**  | [3DLAB](https://3dlab.polito.it/)                             |
 
-### PONTE_DESTRA 
-[streaming_out_1080p_2024-07-17-08.07.49.494-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.07.49.494-UTC_1.mp4) 12:07<br>
-[streaming_out_1080p_2024-07-17-08.07.49.494-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.07.49.494-UTC_2.mp4) 14:07<br>
-[streaming_out_1080p_2024-07-17-08.07.49.494-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.07.49.494-UTC_3.mp4) 16:07<br>
+# Sinossi
 
-
-### PONTE_SINISTRA
-[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_1.mp4) 12:08<br>
-[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_2.mp4) 14:08<br>
-[streaming_out_1080p_2024-07-17-08.08.53.875-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.08.53.875-UTC_3.mp4) 16:08<br>
-
-### BALCONE
-- #### DIETRO
-&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_0.mp4) 10:10<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_1.mp4) 12:10 (switch DIETRO -> AVANTI: **1h 13m**) <br> 
-
-- #### DAVANTI
-&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_2.mp4) 14:10<br>
-&nbsp;&nbsp;&nbsp;&nbsp;[streaming_out_1080p_2024-07-17-08.09.59.484-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.09.59.484-UTC_3.mp4) 16:10<br>
-
-### LUNGO_CANALE
-[streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_1.mp4) 12:11<br>
-[streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_2.mp4) 14:11<br>
-[streaming_out_1080p_2024-07-17-08.11.16.991-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.16.991-UTC_3.mp4) 16:11<br>
-
-### ARRIVO
-[streaming_out_1080p_2024-07-17-08.11.35.842-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.35.842-UTC_1.mp4) 12:11<br>
-[streaming_out_1080p_2024-07-17-08.11.35.842-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.35.842-UTC_2.mp4) 14:11<br>
-[streaming_out_1080p_2024-07-17-08.11.35.842-UTC..>](https://cdn.top-ix.org/ivreacanoa/streaming_out_1080p_2024-07-17-08.11.35.842-UTC_3.mp4) 16:11<br>
-
-
+Questo progetto, realizzato per l’esame di Image Processing and Computer Vision tenuto dal Professor Bartolomeo Montrucchio presso il Politecnico di Torino, in collaborazione con il 3D Lab, si concentra sull'analisi del tracciato seguito dagli atleti durante gli allenamenti nello stadio di canoa slalom del Canoa Club di Ivrea. Il tracciamento viene effettuato utilizzando i modelli YOLO forniti da Ultralytics.
+La relazione presenta gli strumenti e le metodologie impiegati e suggerisce potenziali sviluppi per migliorare lo stadio e creare un sistema di supporto per gli atleti. La struttura del documento segue il seguente schema:
+- Introduzione a YOLO e al Canoa Slalom
+-	Panoramica sul tracciamento degli oggetti con AI
+-	Metodologia utilizzata per il tracciamento
+-	Risultati ottenuti
+-	Conclusioni
+ 
