@@ -18,8 +18,8 @@ VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 # RESULT_ROOT = 'Risultati_NOroi/'
-OFFSET = 25
-FRAME_PRECEDENTI = 5
+OFFSET = 30
+FRAME_PRECEDENTI = 2
 MODEL_FN = 'yolov9e-seg.pt'
 
 # Define the video files and the masks for the trackers
@@ -52,6 +52,8 @@ def get_screen_size():
 
 
 def is_inside(xp, yp, vertices):
+    vertices = [vertices[0], vertices[1], vertices[3], vertices[2]]
+    
     # Crea il poligono usando i vertici
     poligono = Polygon(vertices)
 
@@ -122,9 +124,9 @@ def check(track: list[any], array_porte, frame):
         elif porta.tipo.value == Entrata.ALTO_DX.value:
             segno_os = [0, -1, -4, 1]
         elif porta.tipo.value == Entrata.BASSO_SX.value:
-            segno_os = [0, -1, 4, -1]
+            segno_os = [-3, 1, 0, -1]
         elif porta.tipo.value == Entrata.BASSO_DX.value:
-            segno_os = [0, -1, 4, -1]
+            segno_os = [3, 1, 0, -1]
 
         vertici_full = [
             (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
@@ -141,12 +143,24 @@ def check(track: list[any], array_porte, frame):
         u_y = dy / d
 
         # Calcolo delle nuove coordinate dei punti
-        x3 = int(porta.x3 + OFFSET * u_x)
-        y3 = int(porta.y3 + OFFSET * u_y)
-        x4 = int(porta.x4 + OFFSET * u_x)
-        y4 = int(porta.y4 + OFFSET * u_y)
-        vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (x4, porta.y4)]
-        vertici_px = [(x3, y3), (x4, y4), vertici_full[2], vertici_full[3]]
+        x3 = porta.x3 + OFFSET * u_x
+        y3 = porta.y3 + OFFSET * u_y
+        x4 = porta.x4 + OFFSET * u_x
+        y4 = porta.y4 + OFFSET * u_y
+        if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
+            vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
+                    
+            vertici_px = [(x3, y3), (x4, y4),
+                (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
+                (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
+                    
+        elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
+            vertici_ax = [
+                (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
+                (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
+                (x3, y3), (x4, y4)]
+                    
+            vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
 
         if is_inside(track_rev[0][0], track_rev[0][1], vertici_px):
             for i in range(1, FRAME_PRECEDENTI + 1):
@@ -272,13 +286,13 @@ def run_tracker_in_thread(filename, file_index):
 
             for porta in array_porte:
                 if porta.tipo.value == Entrata.ALTO_SX.value:
-                    segno_os = [0, -1, 4, 0]
+                    segno_os = [0, -1, 4, 1]
                 elif porta.tipo.value == Entrata.ALTO_DX.value:
-                    segno_os = [1, -1, -1, 1]
+                    segno_os = [0, -1, -4, 1]
                 elif porta.tipo.value == Entrata.BASSO_SX.value:
-                    segno_os = [-1, 1, 1, -1]
+                    segno_os = [-3, 1, 0, -1]
                 elif porta.tipo.value == Entrata.BASSO_DX.value:
-                    segno_os = [1, 1, -1, -1]
+                    segno_os = [3, 1, 0, -1]
 
                 vertici_full = [
                     (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
@@ -299,18 +313,29 @@ def run_tracker_in_thread(filename, file_index):
                 y3 = porta.y3 + OFFSET * u_y
                 x4 = porta.x4 + OFFSET * u_x
                 y4 = porta.y4 + OFFSET * u_y
-                vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (x4, y4)]
-                vertici_px = [(x3, y3), (x4, y4), vertici_full[2], vertici_full[3]]
+                
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
+                    vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
+                    
+                    vertici_px = [(x3, y3), (x4, y4),
+                        (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
+                        (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
+                    
+                elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
+                    vertici_ax = [
+                        (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
+                        (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
+                        (x3, y3), (x4, y4)]
+                    
+                    vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
 
                 pts = np.array([vertici_ax], np.int32)
                 pts = pts.reshape((-1, 1, 2))
-
-                cv2.polylines(frame, [pts], isClosed=True, color=(255, 255 ,0), thickness=1, lineType=cv2.LINE_8)
+                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,200), thickness=1, lineType=cv2.LINE_8)
 
                 pts = np.array([vertici_px], np.int32)
                 pts = pts.reshape((-1, 1, 2))
-
-                cv2.polylines(frame, [pts], isClosed=True, color=(0, 255 ,255), thickness=1, lineType=cv2.LINE_8)
+                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,0), thickness=1, lineType=cv2.LINE_8)
 
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
@@ -334,7 +359,7 @@ def run_tracker_in_thread(filename, file_index):
                 frame_count_pass += 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-            cv2.imshow(out_name, frame)
+            # cv2.imshow(out_name, frame)
             # Write the frame to the output file
             out.write(frame)
             frame_num += 1
@@ -355,11 +380,11 @@ def run_tracker_in_thread(filename, file_index):
 # Create the tracker threads
 # tracker_thread1 = threading.Thread(target=run_tracker_in_thread, args=(fn.inizio, model1, 1), daemon=True)
 tracker_thread2 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteDestraShort, 2), daemon=True)
-# tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
-# tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
-# tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
-# tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
-# tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, 6), daemon=True)
+tracker_thread3 = threading.Thread(target=run_tracker_in_thread, args=(fn.ponteSinistra, 3), daemon=True)
+tracker_thread4 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeDietro, 4), daemon=True)
+tracker_thread5 = threading.Thread(target=run_tracker_in_thread, args=(fn.balconeAvanti, 4), daemon=True)
+tracker_thread6 = threading.Thread(target=run_tracker_in_thread, args=(fn.lungoCanale, 5), daemon=True)
+tracker_thread7 = threading.Thread(target=run_tracker_in_thread, args=(fn.arrivo, 6), daemon=True)
 
 # Start the tracker threads
 timer = time.time()
@@ -367,16 +392,16 @@ timer = time.time()
 # timer1 = time.time()
 tracker_thread2.start()
 timer2 = time.time()
-# tracker_thread3.start()
-# timer3 = time.time()
-# tracker_thread4.start()
-# timer4 = time.time()
-# tracker_thread5.start()
-# timer5 = time.time()
-# tracker_thread6.start()
-# timer6 = time.time()
-# tracker_thread7.start()
-# timer7 = time.time()
+tracker_thread3.start()
+timer3 = time.time()
+tracker_thread4.start()
+timer4 = time.time()
+tracker_thread5.start()
+timer5 = time.time()
+tracker_thread6.start()
+timer6 = time.time()
+tracker_thread7.start()
+timer7 = time.time()
 
 # Wait for the tracker threads to finish
 # tracker_thread1.join()
@@ -385,21 +410,21 @@ timer2 = time.time()
 tracker_thread2.join()
 timer2 = time.time() - timer2
 print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
-# tracker_thread3.join()
-# timer3 = time.time() - timer3
-# print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
-# tracker_thread4.join()
-# timer4 = time.time() - timer4
-# print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
-# tracker_thread5.join()
-# timer5 = time.time() - timer5
-# print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
-# tracker_thread6.join()
-# timer6 = time.time() - timer6
-# print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
-# tracker_thread7.join()
-# timer7 = time.time() - timer7
-# print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
+tracker_thread3.join()
+timer3 = time.time() - timer3
+print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
+tracker_thread4.join()
+timer4 = time.time() - timer4
+print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
+tracker_thread5.join()
+timer5 = time.time() - timer5
+print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
+tracker_thread6.join()
+timer6 = time.time() - timer6
+print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
+tracker_thread7.join()
+timer7 = time.time() - timer7
+print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
 
 timer = time.time() - timer
 print(f"l'esecuzione ha impiegato {timer // 60} minuti e {int(timer % 60)} secondi")
