@@ -21,7 +21,7 @@ MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 OFFSET = 30
 FRAME_PRECEDENTI = 2
-MODEL_FN = 'yolov9e-seg.pt'
+MODEL_FN = 'yolov8x-seg.pt'
 
 # Define the video files and the masks for the trackers
 fn = types.SimpleNamespace()
@@ -298,16 +298,15 @@ def run_tracker_in_thread(filename, file_index):
             unique_ids = list(track_history.keys())
             for id in unique_ids:
                 if id not in id_color:
-                    id_color[id] = [(random.randint(0, 125), random.randint(0, 255), random.randint(0, 255))]
+                    id_color[id] = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 125))]
             for id_number, track in track_history.items():
                 # Filtra i punti del track per il frame corrente
                 points = [(x, y) for x, y in track]
                 color = id_color[id_number][0]
-                print(color)
                 # Se ci sono almeno due punti, disegna la polyline
                 if len(points) > 1:
                     points = np.array(points).astype(np.int32).reshape((-1, 1, 2))
-                    cv2.polylines(frame, [points], isClosed=False, color=color, thickness=6, lineType=cv2.LINE_AA)
+                    cv2.polylines(frame, [points], isClosed=False, color=color, thickness=1, lineType=cv2.LINE_AA)
             fontsize = 2
 
             if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
