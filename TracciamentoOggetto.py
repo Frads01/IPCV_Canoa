@@ -21,7 +21,7 @@ MASK_ROOT = 'IstantaneeCamere/'
 RESULT_ROOT = 'Risultati/'
 OFFSET = 30
 FRAME_PRECEDENTI = 2
-MODEL_FN = 'yolov8x-seg.pt'
+MODEL_FN = 'yolov9e-seg.pt'
 
 # Define the video files and the masks for the trackers
 fn = types.SimpleNamespace()
