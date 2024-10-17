@@ -306,7 +306,7 @@ def run_tracker_in_thread(filename, file_index):
                 # Se ci sono almeno due punti, disegna la polyline
                 if len(points) > 1:
                     points = np.array(points).astype(np.int32).reshape((-1, 1, 2))
-                    cv2.polylines(frame, [points], isClosed=False, color=color, thickness=1, lineType=cv2.LINE_AA)
+                    cv2.polylines(frame, [points], isClosed=False, color=color, thickness=2, lineType=cv2.LINE_AA)
             fontsize = 2
 
             if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
