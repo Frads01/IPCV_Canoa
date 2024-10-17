@@ -4,6 +4,8 @@ import threading
 import time
 from collections import defaultdict
 import tkinter as tk
+import random
+
 from shapely.geometry import Point, Polygon
 import torch
 
@@ -202,7 +204,7 @@ def run_tracker_in_thread(filename, file_index):
 
     # Store the track history
     track_history = defaultdict(lambda: [])
-
+    id_color = defaultdict(list)
     cap = cv2.VideoCapture(VIDEO_ROOT + filename + '.mp4')  # Read the video file
     success, frame = cap.read()
     numero_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -279,7 +281,7 @@ def run_tracker_in_thread(filename, file_index):
 
                         file_track.write(str(f"Frame {frame_num} - ID {track_id}:\t{int(x)},\t{int(y)} \n"))
 
-                        track.append((int(x), int(y)))  # x, y center point
+                        track.append((int(x), int(y)))
                         # if len(track) > 160:  # retain 90 tracks for 160 frames
                         #    track.pop(0)
 
@@ -288,12 +290,24 @@ def run_tracker_in_thread(filename, file_index):
                             passed = check(track, array_porte,frame_num)
 
                         # Draw the tracking lines
-                        points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
-                        cv2.polylines(annotated_frame, [points], isClosed=False, color=(255, 255, 255), thickness=1,
-                                      lineType=cv2.LINE_AA)
+                        # points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
+                        # cv2.polylines(annotated_frame, [points], isClosed=False, color=(255, 255, 255), thickness=1,
+                        #               lineType=cv2.LINE_AA)
                     maschera = annotated_frame > 1
                     frame[maschera] = annotated_frame[maschera]
-
+            unique_ids = list(track_history.keys())
+            for id in unique_ids:
+                if id not in id_color:
+                    id_color[id] = [(random.randint(0, 125), random.randint(0, 255), random.randint(0, 255))]
+            for id_number, track in track_history.items():
+                # Filtra i punti del track per il frame corrente
+                points = [(x, y) for x, y in track]
+                color = id_color[id_number][0]
+                print(color)
+                # Se ci sono almeno due punti, disegna la polyline
+                if len(points) > 1:
+                    points = np.array(points).astype(np.int32).reshape((-1, 1, 2))
+                    cv2.polylines(frame, [points], isClosed=False, color=color, thickness=6, lineType=cv2.LINE_AA)
             fontsize = 2
 
             if passed is not None and passed[0] is not Passato.NON_PASSATO.value[0]:
@@ -315,7 +329,7 @@ def run_tracker_in_thread(filename, file_index):
                 frame_count_pass += 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-            #cv2.imshow(out_name, frame)
+            cv2.imshow(out_name, frame)
             # Write the frame to the output file
             out.write(frame)
             frame_num += 1
@@ -351,16 +365,16 @@ timer = time.time()
 # timer1 = time.time()
 tracker_thread2.start()
 timer2 = time.time()
-tracker_thread3.start()
-timer3 = time.time()
-# tracker_thread4.start()
-# timer4 = time.time()
-tracker_thread5.start()
-timer5 = time.time()
-tracker_thread6.start()
-timer6 = time.time()
-tracker_thread7.start()
-timer7 = time.time()
+# tracker_thread3.start()
+# timer3 = time.time()
+# # tracker_thread4.start()
+# # timer4 = time.time()
+# tracker_thread5.start()
+# timer5 = time.time()
+# tracker_thread6.start()
+# timer6 = time.time()
+# tracker_thread7.start()
+# timer7 = time.time()
 
 # Wait for the tracker threads to finish
 # tracker_thread1.join()
@@ -369,21 +383,21 @@ timer7 = time.time()
 tracker_thread2.join()
 timer2 = time.time() - timer2
 print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
-tracker_thread3.join()
-timer3 = time.time() - timer3
-print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
-# tracker_thread4.join()
-# timer4 = time.time() - timer4
-# print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
-tracker_thread5.join()
-timer5 = time.time() - timer5
-print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
-tracker_thread6.join()
-timer6 = time.time() - timer6
-print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
-tracker_thread7.join()
-timer7 = time.time() - timer7
-print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
+# tracker_thread3.join()
+# timer3 = time.time() - timer3
+# print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
+# # tracker_thread4.join()
+# # timer4 = time.time() - timer4
+# # print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
+# tracker_thread5.join()
+# timer5 = time.time() - timer5
+# print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
+# tracker_thread6.join()
+# timer6 = time.time() - timer6
+# print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
+# tracker_thread7.join()
+# timer7 = time.time() - timer7
+# print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
 
 timer = time.time() - timer
 print(f"l'esecuzione ha impiegato {timer // 60} minuti e {int(timer % 60)} secondi")
