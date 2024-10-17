@@ -1,7 +1,7 @@
 # Progetto Image Processing and Computer Vision - Canoa Slalom
 
 |       **Corso**       	|          Image Processing and Computer Vision (01TUJ)         	|
-|:---------------------:	|:-------------------------------------------------------------:	|
+|:----------------------	|:--------------------------------------------------------------	|
 |  **Docente titolare** 	|                  Prof. Montrucchio Bartolomeo                 	|
 | **Membri del gruppo** 	|  Di Santo Francesco<br>Giugliano Salvatore<br>Rosace Giovanna 	|
 |    **Coordinatori**   	|         Dott. Ulrich Luca<br>Dott.ssa Marullo Giorgia	         |
