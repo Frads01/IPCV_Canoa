@@ -141,12 +141,20 @@ def check(track: list[any], array_porte, frame):
         # Normalizzazione del vettore direttore
         u_x = dx / d
         u_y = dy / d
+        
+        x3 = (porta.x3 + OFFSET * u_x
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                else porta.x3 - OFFSET * u_x)
+        y3 = (porta.y3 + OFFSET * u_y
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                else porta.y3 - OFFSET * u_y)
+        x4 = (porta.x4 + OFFSET * u_x
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                else porta.x4 - OFFSET * u_x)
+        y4 = (porta.y4 + OFFSET * u_y
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                else porta.y4 - OFFSET * u_y)
 
-        # Calcolo delle nuove coordinate dei punti
-        x3 = porta.x3 + OFFSET * u_x
-        y3 = porta.y3 + OFFSET * u_y
-        x4 = porta.x4 + OFFSET * u_x
-        y4 = porta.y4 + OFFSET * u_y
         if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
             vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
             
@@ -284,58 +292,65 @@ def run_tracker_in_thread(filename, file_index):
             # except UnboundLocalError:
             #     pass
 
-            # for porta in array_porte:
-            #     if porta.tipo.value == Entrata.ALTO_SX.value:
-            #         segno_os = [0, -1, 4, 1]
-            #     elif porta.tipo.value == Entrata.ALTO_DX.value:
-            #         segno_os = [0, -1, -4, 1]
-            #     elif porta.tipo.value == Entrata.BASSO_SX.value:
-            #         segno_os = [-3, 1, 0, -1]
-            #     elif porta.tipo.value == Entrata.BASSO_DX.value:
-            #         segno_os = [3, 1, 0, -1]
+            for porta in array_porte:
+                if porta.tipo.value == Entrata.ALTO_SX.value:
+                    segno_os = [0, -1, 4, 1]
+                elif porta.tipo.value == Entrata.ALTO_DX.value:
+                    segno_os = [0, -1, -4, 1]
+                elif porta.tipo.value == Entrata.BASSO_SX.value:
+                    segno_os = [-3, 1, 0, -1]
+                elif porta.tipo.value == Entrata.BASSO_DX.value:
+                    segno_os = [3, 1, 0, -1]
 
-            #     vertici_full = [
-            #         (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-            #         (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
-            #         (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
-            #         (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
-            #     ]
-            #     dx = porta.x4 - porta.x3
-            #     dy = porta.y4 - porta.y3
-            #     d = math.sqrt(dx ** 2 + dy ** 2)
+                vertici_full = [
+                    (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
+                    (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
+                    (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
+                    (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
+                ]
+                dx = porta.x4 - porta.x3
+                dy = porta.y4 - porta.y3
+                d = math.sqrt(dx ** 2 + dy ** 2)
 
-            #     # Normalizzazione del vettore direttore
-            #     u_x = dx / d
-            #     u_y = dy / d
-
-            #     # Calcolo delle nuove coordinate dei punti
-            #     x3 = porta.x3 + OFFSET * u_x
-            #     y3 = porta.y3 + OFFSET * u_y
-            #     x4 = porta.x4 + OFFSET * u_x
-            #     y4 = porta.y4 + OFFSET * u_y
+                # Normalizzazione del vettore direttore
+                u_x = dx / d
+                u_y = dy / d
                 
-            #     if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
-            #         vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
-                    
-            #         vertici_px = [(x3, y3), (x4, y4),
-            #             (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
-            #             (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
-                    
-            #     elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
-            #         vertici_ax = [
-            #             (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
-            #             (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
-            #             (x3, y3), (x4, y4)]
-                    
-            #         vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
+                x3 = (porta.x3 + OFFSET * u_x
+                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                      else porta.x3 - OFFSET * u_x)
+                y3 = (porta.y3 + OFFSET * u_y
+                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                      else porta.y3 - OFFSET * u_y)
+                x4 = (porta.x4 + OFFSET * u_x
+                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                      else porta.x4 - OFFSET * u_x)
+                y4 = (porta.y4 + OFFSET * u_y
+                      if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+                      else porta.y4 - OFFSET * u_y)
 
-            #     pts = np.array([vertici_ax], np.int32)
-            #     pts = pts.reshape((-1, 1, 2))
-            #     cv2.polylines(frame, [pts], isClosed=True, color=(0,0,200), thickness=1, lineType=cv2.LINE_8)
+                if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
+                    vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
+                    
+                    vertici_px = [(x3, y3), (x4, y4),
+                        (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
+                        (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
+                    
+                elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
+                    vertici_ax = [
+                        (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
+                        (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
+                        (x3, y3), (x4, y4)]
+                    
+                    vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
 
-            #     pts = np.array([vertici_px], np.int32)
-            #     pts = pts.reshape((-1, 1, 2))
-            #     cv2.polylines(frame, [pts], isClosed=True, color=(0,0,0), thickness=1, lineType=cv2.LINE_8)
+                pts = np.array([vertici_ax], np.int32)
+                pts = pts.reshape((-1, 1, 2))
+                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,200), thickness=1, lineType=cv2.LINE_8)
+
+                pts = np.array([vertici_px], np.int32)
+                pts = pts.reshape((-1, 1, 2))
+                cv2.polylines(frame, [pts], isClosed=True, color=(0,0,0), thickness=1, lineType=cv2.LINE_8)
 
             # cv2.putText(frame, 'Frame ' + str(frame_num), (10, frame.shape[0] - (40 * fontsize)),
             #             cv2.FONT_HERSHEY_SIMPLEX, fontsize, (255, 255, 255), 3, cv2.LINE_AA)
@@ -359,7 +374,7 @@ def run_tracker_in_thread(filename, file_index):
                 frame_count_pass += 1
 
             frame = cv2.resize(frame, (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-            # cv2.imshow(out_name, frame)
+            cv2.imshow(out_name, frame)
             # Write the frame to the output file
             out.write(frame)
             frame_num += 1
