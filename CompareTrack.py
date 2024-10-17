@@ -53,6 +53,7 @@ else:
         # Inizializza un dizionario per memorizzare le tracce di ogni ID
         tracks_per_id = defaultdict(list)
         #SALTARE PRIMA LINEA, NEL MOMENTO IN CUI SARà PRESENTE IL CONTEGGIO DEL TEMPO
+        file.readline()
         for line in file:
             due_punti  = 0
             virgola = 0

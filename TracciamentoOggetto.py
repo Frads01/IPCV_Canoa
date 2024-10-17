@@ -375,7 +375,7 @@ print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} seco
 # tracker_thread4.join()
 # timer4 = time.time() - timer4
 # print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
-# tracker_thread5.join()
+tracker_thread5.join()
 timer5 = time.time() - timer5
 print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
 tracker_thread6.join()
