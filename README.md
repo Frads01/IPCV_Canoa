@@ -4,7 +4,8 @@
 |:---------------------:	|:-------------------------------------------------------------:	|
 |  **Docente titolare** 	|                  Prof. Montrucchio Bartolomeo                 	|
 | **Membri del gruppo** 	|  Di Santo Francesco<br>Giugliano Salvatore<br>Rosace Giovanna 	|
-|    **Coordinatori**   	| Dott. Ulrich Luca<br>Dott.ssa Marullo Giorgia	|
+|    **Coordinatori**   	|         Dott. Ulrich Luca<br>Dott.ssa Marullo Giorgia	         |
+| **Gruppo di ricerca**  | [3DLAB] (https://3dlab.polito.it/)                             |
 
 # Sinossi
 
