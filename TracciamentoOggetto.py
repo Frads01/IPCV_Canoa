@@ -1,20 +1,18 @@
 import math
 import os
+import random
 import threading
 import time
-from collections import defaultdict
 import tkinter as tk
-import random
+import types
+from collections import defaultdict
 
-from shapely.geometry import Point, Polygon
+import numpy as np
 import torch
+from shapely.geometry import Point, Polygon
+from ultralytics import YOLO
 
 from CoordinatePorte_170724 import *
-# from CoordinatePorte_040924 import *
-import types
-
-from ultralytics import YOLO
-import numpy as np
 
 VIDEO_ROOT = 'Video_Canoa/'
 MASK_ROOT = 'IstantaneeCamere/'
@@ -34,31 +32,18 @@ fn.balconeAvanti = '4-BalconeAvanti'
 fn.lungoCanale = '5-LungoCanale'
 fn.arrivo = '6-Arrivo'
 
-# Results
-# Array di tuple (int, int), dove il primo elemento è numerato da 1 a 60
 porte_passate = [(i, 0, (0, 0)) for i in range(1, 61)]
 frame_totali = []
 frame_totali_lock = threading.Lock()
-# il primo valore è il numero della porta, il secodo è l'enum che indica se passato o meno,
-# mentre la tupla indica la posizione in cui si è rilevato il passaggio
 
-# Creare un lock per sincronizzare l'accesso all'array
 porte_passate_lock = threading.Lock()
 
 data = str(input("\nInserisci la data dell'esecuzione in formato dd/mm/aaaa"))
 orario = str(input("\nInserisci l'orario dell'esecuzione  in formato hh:mm:ss"))
 
-def get_screen_size():
-    root = tk.Tk()
-    root.withdraw()  # Hide the root window
-    width = root.winfo_screenwidth()
-    height = root.winfo_screenheight()
-    return width, height
-
-
 def is_inside(xp, yp, vertices):
     vertices = [vertices[0], vertices[1], vertices[3], vertices[2]]
-    
+
     # Crea il poligono usando i vertici
     poligono = Polygon(vertices)
 
@@ -67,7 +52,6 @@ def is_inside(xp, yp, vertices):
 
     # Restituisci True se il punto è all'interno o sul bordo del poligono
     return poligono.intersects(punto)
-
 
 def check_orientation(pos_corrente, pos_precedente, porta: Porta):
     if porta.color == GREEN:
@@ -107,7 +91,6 @@ def check_orientation(pos_corrente, pos_precedente, porta: Porta):
                     return Passato.PASSATO_MALE.value
                 return Passato.PASSATO.value
 
-
 def define_check_rects(porta):
     if porta.tipo.value == Entrata.ALTO_SX.value:
         segno_os = [0, -1, 4, 1]
@@ -119,48 +102,47 @@ def define_check_rects(porta):
         segno_os = [3, 1, 0, -1]
 
     vertici_full = [
-                    (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
-                    (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
-                    (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
-                    (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
-                ]
+        (porta.x3 + segno_os[0] * OFFSET, porta.y3 + segno_os[1] * OFFSET),
+        (porta.x4 + segno_os[0] * OFFSET, porta.y4 + segno_os[1] * OFFSET),
+        (porta.x3 + segno_os[2] * OFFSET, porta.y3 + segno_os[3] * OFFSET),
+        (porta.x4 + segno_os[2] * OFFSET, porta.y4 + segno_os[3] * OFFSET)
+    ]
     dx = porta.x4 - porta.x3
     dy = porta.y4 - porta.y3
     d = math.sqrt(dx ** 2 + dy ** 2)
 
-                # Normalizzazione del vettore direttore
+    # Normalizzazione del vettore direttore
     u_x = dx / d
     u_y = dy / d
-                
+
     x3 = (porta.x3 + OFFSET * u_x
-            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-            else porta.x3 - OFFSET * u_x)
+          if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+          else porta.x3 - OFFSET * u_x)
     y3 = (porta.y3 + OFFSET * u_y
-            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-            else porta.y3 - OFFSET * u_y)
+          if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+          else porta.y3 - OFFSET * u_y)
     x4 = (porta.x4 + OFFSET * u_x
-            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-            else porta.x4 - OFFSET * u_x)
+          if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+          else porta.x4 - OFFSET * u_x)
     y4 = (porta.y4 + OFFSET * u_y
-            if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
-            else porta.y4 - OFFSET * u_y)
+          if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value
+          else porta.y4 - OFFSET * u_y)
 
     if porta.tipo.value == Entrata.ALTO_DX.value or porta.tipo.value == Entrata.ALTO_SX.value:
         vertici_ax = [vertici_full[0], vertici_full[1], (porta.x3, porta.y3), (porta.x4, porta.y4)]
-                    
+
         vertici_px = [(x3, y3), (x4, y4),
-                        (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
-                        (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
-                    
+                      (vertici_full[2][0] + u_x, vertici_full[2][1] + u_y),
+                      (vertici_full[3][0] + u_x, vertici_full[3][1] + u_y)]
+
     elif porta.tipo.value == Entrata.BASSO_DX.value or porta.tipo.value == Entrata.BASSO_SX.value:
         vertici_ax = [
-                        (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
-                        (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
-                        (x3, y3), (x4, y4)]
-                    
+            (vertici_full[0][0] + u_x, vertici_full[0][1] + u_y),
+            (vertici_full[1][0] + u_x, vertici_full[1][1] + u_y),
+            (x3, y3), (x4, y4)]
+
         vertici_px = [(porta.x3, porta.y3), (porta.x4, porta.y4), vertici_full[2], vertici_full[3]]
     return vertici_ax, vertici_px
-
 
 def check(track: list[any], array_porte, frame):
     # global segno_os
@@ -172,10 +154,10 @@ def check(track: list[any], array_porte, frame):
 
         # (xm, ym) = (porta.x3 + porta.x4) / 2, (porta.y3 + porta.y4) / 2
         # segno_os = [
-            # offsetx_alto,
-            # offsety_alto,
-            # offsetx_basso,
-            # offsety_basso
+        # offsetx_alto,
+        # offsety_alto,
+        # offsetx_basso,
+        # offsety_basso
         # ]
 
         vertici_ax, vertici_px = define_check_rects(porta)
@@ -186,7 +168,6 @@ def check(track: list[any], array_porte, frame):
                     return check_orientation(track_rev[0], track_rev[2], porta)[0], porta.numero
 
     return None
-
 
 def run_tracker_in_thread(filename, file_index):
     # Instantiate a separate model object within each thread to ensure they do not share state which could
@@ -200,7 +181,6 @@ def run_tracker_in_thread(filename, file_index):
         print("CUDA device NOT found. Using CPU for inference.")
 
     passed = None
-    scr_width, scr_height = get_screen_size()
 
     # Store the track history
     track_history = defaultdict(lambda: [])
@@ -217,7 +197,7 @@ def run_tracker_in_thread(filename, file_index):
     out_name = str(RESULT_ROOT + filename + '_track.mp4')
     out = cv2.VideoWriter(
         out_name,
-        cv2.VideoWriter.fourcc('m','p','4','v'),
+        cv2.VideoWriter.fourcc('m', 'p', '4', 'v'),
         cap.get(cv2.CAP_PROP_FPS),
         (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
 
@@ -246,11 +226,11 @@ def run_tracker_in_thread(filename, file_index):
     except NameError:
         pass
 
-    file_track.write("Data: " + data + "Ora:" + orario +"\n")
+    file_track.write("Data: " + data + "Ora:" + orario + "\n")
 
     frame_num = 1
     frame_count_pass = 1
-    pass_print = (0,0)
+    pass_print = (0, 0)
     while cap.isOpened() and frame is not None:
         print(str(f"thread {file_index} : frame {frame_num} of {numero_frame}"))
         # Read a frame from the video
@@ -287,12 +267,8 @@ def run_tracker_in_thread(filename, file_index):
 
                         # Checks if the player has passed through a door 
                         if len(track) >= FRAME_PRECEDENTI + 1:
-                            passed = check(track, array_porte,frame_num)
+                            passed = check(track, array_porte, frame_num)
 
-                        # Draw the tracking lines
-                        # points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
-                        # cv2.polylines(annotated_frame, [points], isClosed=False, color=(255, 255, 255), thickness=1,
-                        #               lineType=cv2.LINE_AA)
                     maschera = annotated_frame > 1
                     frame[maschera] = annotated_frame[maschera]
             unique_ids = list(track_history.keys())
@@ -313,8 +289,9 @@ def run_tracker_in_thread(filename, file_index):
                 frame_count_pass = 1
                 pass_print = passed
                 with porte_passate_lock:
-                    print(f"Thread {file_index}: Modifica arrayPorte nella posizione {passed[1]} con risultato {passed[0]}")
-                    porte_passate[passed[1]-1] = (passed[1], passed[0], (int(x), int(y)))
+                    print(
+                        f"Thread {file_index}: Modifica arrayPorte nella posizione {passed[1]} con risultato {passed[0]}")
+                    porte_passate[passed[1] - 1] = (passed[1], passed[0], (int(x), int(y)))
 
             if 6 >= frame_count_pass > 0:
                 if pass_print[0] == Passato.PASSATO.value[0]:
@@ -342,7 +319,7 @@ def run_tracker_in_thread(filename, file_index):
     with frame_totali_lock:
         frame_totali.append(frame_num)
     # Release video sources
-    print(f"Il video {filename}, elaborato dal thread {file_index}, dura {frame_num/cap.get(cv2.CAP_PROP_FPS)} s \n")
+    print(f"Il video {filename}, elaborato dal thread {file_index}, dura {frame_num / cap.get(cv2.CAP_PROP_FPS)} s \n")
     file_track.close()
     out.release()
     cap.release()
@@ -364,16 +341,16 @@ timer = time.time()
 # timer1 = time.time()
 tracker_thread2.start()
 timer2 = time.time()
-# tracker_thread3.start()
-# timer3 = time.time()
-# # tracker_thread4.start()
-# # timer4 = time.time()
-# tracker_thread5.start()
-# timer5 = time.time()
-# tracker_thread6.start()
-# timer6 = time.time()
-# tracker_thread7.start()
-# timer7 = time.time()
+tracker_thread3.start()
+timer3 = time.time()
+# tracker_thread4.start()
+# timer4 = time.time()
+tracker_thread5.start()
+timer5 = time.time()
+tracker_thread6.start()
+timer6 = time.time()
+tracker_thread7.start()
+timer7 = time.time()
 
 # Wait for the tracker threads to finish
 # tracker_thread1.join()
@@ -382,21 +359,21 @@ timer2 = time.time()
 tracker_thread2.join()
 timer2 = time.time() - timer2
 print(f"il thread 2 ha impiegato {timer2 // 60} minuti e {int(timer2 % 60)} secondi")
-# tracker_thread3.join()
-# timer3 = time.time() - timer3
-# print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
-# # tracker_thread4.join()
-# # timer4 = time.time() - timer4
-# # print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
-# tracker_thread5.join()
-# timer5 = time.time() - timer5
-# print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
-# tracker_thread6.join()
-# timer6 = time.time() - timer6
-# print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
-# tracker_thread7.join()
-# timer7 = time.time() - timer7
-# print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
+tracker_thread3.join()
+timer3 = time.time() - timer3
+print(f"il thread 3 ha impiegato {timer3 // 60} minuti e {int(timer3 % 60)} secondi")
+# tracker_thread4.join()
+# timer4 = time.time() - timer4
+# print(f"il thread 4 ha impiegato {timer4 // 60} minuti e {int(timer4 % 60)} secondi")
+tracker_thread5.join()
+timer5 = time.time() - timer5
+print(f"il thread 5 ha impiegato {timer5 // 60} minuti e {int(timer5 % 60)} secondi")
+tracker_thread6.join()
+timer6 = time.time() - timer6
+print(f"il thread 6 ha impiegato {timer6 // 60} minuti e {int(timer6 % 60)} secondi")
+tracker_thread7.join()
+timer7 = time.time() - timer7
+print(f"il thread 7 ha impiegato {timer7 // 60} minuti e {int(timer7 % 60)} secondi")
 
 timer = time.time() - timer
 print(f"l'esecuzione ha impiegato {timer // 60} minuti e {int(timer % 60)} secondi")
@@ -410,7 +387,7 @@ else:
 
 file_porte = open(porte_file_path, 'w')
 
-secondi = round(sum(frame_totali) / frame_rate,3)
+secondi = round(sum(frame_totali) / frame_rate, 3)
 print(secondi)
 file_porte.write("Tempo: " + str(secondi) + "\n")
 for porta in porte_passate:
