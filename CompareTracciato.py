@@ -95,10 +95,15 @@ else:
                 else:
                     print("Scelta non valida.")
             cap = cv2.VideoCapture(percorso_file)
+            out = cv2.VideoWriter(
+            'Risultati/compare.mp4',
+            cv2.VideoWriter.fourcc('m','p','4','v'),
+            cap.get(cv2.CAP_PROP_FPS),
+            (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
             frame_num = 1
             # Estrai tutti gli ID da tracks_per_id e generali colori per ogni ID unico
-            unique_ids = list(tracks_per_id.keys())
-            colors = {id_number: (random.randint(0, 125), random.randint(0, 255), random.randint(0, 255)) for id_number in unique_ids}
+            #unique_ids = list(tracks_per_id.keys())
+            #colors = {id_number: (random.randint(0, 125), random.randint(0, 255), random.randint(0, 255)) for id_number in unique_ids}
             while cap.isOpened():
                 ret, frame = cap.read()
                 # Controlla se il frame è valido
@@ -113,16 +118,18 @@ else:
                     # Se ci sono almeno due punti, disegna la polyline
                     if len(points) > 1:
                         points = np.array(points).astype(np.int32).reshape((-1, 1, 2))
-                        color = colors[id_number]  # Ottieni il colore per questo ID
-                        cv2.polylines(frame, [points], isClosed=False, color=color, thickness=6, lineType=cv2.LINE_AA)
+                        #color = colors[id_number]  # Ottieni il colore per questo ID
+                        cv2.polylines(frame, [points], isClosed=False, color=(0,0,255), thickness=6, lineType=cv2.LINE_AA)
                         
                 # Visualizza il frame con le polylines
                 cv2.imshow("Compare", frame)
+                out.write(frame)
 
                 frame_num += 1
                 # Aggiungi il waitKey per gestire correttamente il ciclo degli eventi
                 if cv2.waitKey(1) & 0xFF == ord('q'):  # Premendo 'q' l'utente può chiudere il video
                     break
+            out.release()
             cap.release()
 while(1):
     if cv2.waitKey(1) & 0xFF == ord('q'):
